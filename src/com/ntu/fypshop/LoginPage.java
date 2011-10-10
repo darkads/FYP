@@ -2,14 +2,15 @@ package com.ntu.fypshop;
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
-import com.facebook.android.Util;
+//import com.facebook.android.Util;
 
 import android.app.Activity;
-import android.content.Context;
+//import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 //import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
@@ -22,10 +23,12 @@ public class LoginPage extends Activity {
 	// private final Handler mFacebookHandler = new Handler();
 
 	private FacebookBtn fblogin;
-	private static GlobalVariable FbState, fbBtn;
+	private static GlobalVariable globalVar;
 	private Facebook mFacebook;
-	private AsyncFacebookRunner mAsyncRunner;
+	//private AsyncFacebookRunner mAsyncRunner;
 	private ImageButton regBtn;
+	private Button login;
+	private EditText email, password;
 
 	Handler mHandler = new Handler();
 
@@ -49,8 +52,8 @@ public class LoginPage extends Activity {
 		// "specified before running this example: see Example.java");
 		// }
 
-		FbState = ((GlobalVariable) getApplicationContext());
-		mFacebook = FbState.getFBState();
+		globalVar = ((GlobalVariable) getApplicationContext());
+		mFacebook = globalVar.getFBState();
 		if (mFacebook.isSessionValid())
 		{
 			SessionStore.restore(mFacebook, this);
@@ -59,15 +62,52 @@ public class LoginPage extends Activity {
 		{
 			mFacebook = new Facebook(APP_ID);
 		}
+		
+		email = (EditText) findViewById(R.id.emailTxtBox);
+		password = (EditText) findViewById(R.id.pwTxtBox);
+		login = (Button) findViewById(R.id.loginBtn);
 		fblogin = (FacebookBtn) findViewById(R.id.fbLoginBtn);
 		regBtn = (ImageButton) findViewById(R.id.registerBtn);
 
+		loginInit();
+
 		fblogin.init(this, mFacebook, getApplicationContext());
-		fbinit();
-		mAsyncRunner = new AsyncFacebookRunner(mFacebook);
+		fbInit();
 
-		reginit();
+		//mAsyncRunner = new AsyncFacebookRunner(mFacebook);
+		regInit();
 
+	}
+
+	private void loginInit()
+	{
+		// TODO Auto-generated method stub
+		login.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				Log.d("Password: ", password.getText().toString());
+				ConnectDB connectCheck = new ConnectDB(email.getText().toString(), password.getText().toString());
+				if (connectCheck.inputResult())
+				{
+					Log.d("Authenticate User: ","True");
+					globalVar = ((GlobalVariable) getApplicationContext());
+					globalVar.setName(connectCheck.getName());
+					globalVar.setfbBtn(false);
+					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					Log.d("GlobalVariable name: ", globalVar.getName());
+					// startActivityForResult means that Activity1 can expect
+					// info
+					// back from Activity2.
+					startActivityForResult(intent, 0);
+				}
+				else
+				{
+					//do something else
+					Log.d("Authenticate User: ","False");
+				}
+			}
+		});
 	}
 
 	// public void fbinit(final Activity activity, final Facebook fb, final
@@ -91,7 +131,7 @@ public class LoginPage extends Activity {
 	// }
 	// });
 	// }
-	public void fbinit()
+	public void fbInit()
 	{
 		fblogin.setOnClickListener(new View.OnClickListener()
 		{
@@ -102,9 +142,9 @@ public class LoginPage extends Activity {
 				if (!mFacebook.isSessionValid())
 				{
 					// TODO Auto-generated method stub
-					Intent intent = new Intent(v.getContext(), Registration.class);
-					fbBtn = ((GlobalVariable)getApplicationContext());
-					fbBtn.setfbBtn(true);
+					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					globalVar = ((GlobalVariable) getApplicationContext());
+					globalVar.setfbBtn(true);
 					startActivityForResult(intent, 1);
 				}
 				else
@@ -117,7 +157,7 @@ public class LoginPage extends Activity {
 		});
 	}
 
-	public void reginit()
+	public void regInit()
 	{
 		regBtn.setOnClickListener(new View.OnClickListener()
 		{
@@ -125,8 +165,8 @@ public class LoginPage extends Activity {
 			{
 				Intent intent = new Intent(v.getContext(), Registration.class);
 
-				fbBtn = ((GlobalVariable)getApplicationContext());
-				fbBtn.setfbBtn(false);
+				globalVar = ((GlobalVariable) getApplicationContext());
+				globalVar.setfbBtn(false);
 				// startActivityForResult means that Activity1 can expect info
 				// back from Activity2.
 				startActivityForResult(intent, 0);
@@ -149,10 +189,10 @@ public class LoginPage extends Activity {
 	protected void onResume()
 	{
 		super.onResume();
-		FbState = ((GlobalVariable) getApplicationContext());
-		mFacebook = FbState.getFBState();
+		globalVar = ((GlobalVariable) getApplicationContext());
+		mFacebook = globalVar.getFBState();
 		// updateLoginStatus();
-		fbinit();
+		fbInit();
 	}
 
 	// public class LoginRequestListener extends BaseRequestListener {

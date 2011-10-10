@@ -23,49 +23,23 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:orientation="horizontal"
-		android:paddingLeft="10px"
-		android:paddingTop="15px">
-		<ImageButton
-			android:id="@+id/userImage"
-			android:layout_width="100dp"
-			android:layout_height="100dp"
-			android:src="@drawable/icon">
-		</ImageButton>
-		<LinearLayout
-			android:layout_width="wrap_content"
+		android:paddingLeft="20px"
+		android:paddingTop="10px">
+		<TextView
+			android:id="@+id/nameTxt"
+			android:layout_width="80dp"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:paddingLeft="10px">
-			<TextView
-				android:id="@+id/fnameTxt"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/fname">
-			</TextView>
-			<EditText
-				android:id="@+id/fnameTxtBox"
-				android:layout_height="30dp"
-				android:layout_width="180dp"
-				android:textSize="10px">
-			</EditText>
-			<TextView
-				android:id="@+id/lnameTxt"
-				android:layout_height="wrap_content"
-				android:text="@string/lname"
-				android:layout_width="wrap_content"
-				android:layout_alignRight="@+id/fnameTxt">
-			</TextView>
+			android:text="@string/name"
+			android:layout_gravity="center">
+		</TextView>
 
-			<EditText
-				android:id="@+id/lnameTxtBox"
-				android:layout_height="30dp"
-				android:layout_width="180dp"
-				android:inputType="textPersonName"
-				android:layout_below="@+id/lnameTxt"
-				android:layout_alignLeft="@+id/fnameTxtBox"
-				android:textSize="10px">
-			</EditText>
-		</LinearLayout>
+		<EditText
+			android:layout_width="200dp"
+			android:inputType="text"
+			android:textSize="10px"
+			android:layout_height="30dp"
+			android:id="@+id/nameTxtBox">
+		</EditText>
 	</LinearLayout>
 
 	<LinearLayout
@@ -136,73 +110,17 @@
 		</EditText>
 	</LinearLayout>
 
-	<LinearLayout
+	<RelativeLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingLeft="20px">
-		<TextView
-			android:layout_width="80dp"
-			android:id="@+id/genderTxt"
-			android:layout_height="wrap_content"
-			android:text="@string/gender"
-			android:layout_gravity="center">
-		</TextView>
+		android:layout_gravity="center_horizontal"
+		android:paddingTop="20px">
+		<Button
+			android:text="Register"
+			android:id="@+id/regBtn"
+			android:layout_width="100dp"
+			android:layout_height="40dp">
+		</Button>
+	</RelativeLayout>
 
-		<RadioGroup
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:orientation="horizontal"
-			android:id="@+id/gender">
-			<RadioButton
-				android:id="@+id/male"
-				android:layout_width="80dp"
-				android:layout_height="wrap_content"
-				android:text="Male"
-				android:button="@drawable/radio">
-			</RadioButton>
-			<RadioButton
-				android:id="@+id/female"
-				android:layout_height="wrap_content"
-				android:text="Female"
-				android:layout_width="90dp"
-				android:button="@drawable/radio">
-			</RadioButton>
-		</RadioGroup>
-	</LinearLayout>
-
-	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingLeft="20px">
-		<TextView
-			android:id="@+id/bdateTxt"
-			android:layout_width="80dp"
-			android:layout_height="wrap_content"
-			android:text="@string/birthdate">
-		</TextView>
-
-		<LinearLayout
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:orientation="vertical">
-			<Button
-				android:id="@+id/bdateBtn"
-				android:layout_width="wrap_content"
-				android:layout_alignTop="@+id/bdateTxt"
-				android:layout_alignLeft="@+id/gender"
-				android:layout_height="35dp"
-				android:text="@string/setBirthdate"
-				android:textSize="12px">
-			</Button>
-
-			<TextView
-				android:id="@+id/bdateTxt1"
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:text=" ">
-			</TextView>
-		</LinearLayout>
-	</LinearLayout>
 </LinearLayout>

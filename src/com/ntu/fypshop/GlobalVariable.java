@@ -9,6 +9,7 @@ public class GlobalVariable extends Application
 	private static final String APP_ID = "222592464462347";
       private Facebook myFbState = new Facebook(APP_ID);
       private Boolean fbBtn = false;
+      private String name = "";
 
       public Facebook getFBState()
       {
@@ -28,5 +29,15 @@ public class GlobalVariable extends Application
       public void setfbBtn(Boolean b)
       {
     	  fbBtn = b;
+      }
+      
+      public String getName()
+      {
+    	  return name;
+      }
+      
+      public void setName(String n)
+      {
+    	  name = n;
       }
 }//End Class

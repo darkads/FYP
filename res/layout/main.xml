@@ -52,8 +52,8 @@
 	<EditText
 		android:layout_width="210dp"
 		android:inputType="textPassword"
-		android:id="@+id/passwordTxt"
-		android:layout_alignTop="@+id/pwTxtBox"
+		android:id="@+id/pwTxtBox"
+		android:layout_alignTop="@+id/passwordTxt"
 		android:layout_alignLeft="@+id/emailTxtBox"
 		android:textSize="17px"
 		android:textScaleX="0.7"
@@ -65,7 +65,7 @@
 
 	<TextView
 		android:text="@string/password"
-		android:id="@+id/pwTxtBox"
+		android:id="@+id/passwordTxt"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/emailTxtBox"
@@ -89,25 +89,36 @@
 	<!-- android:layout_below="@+id/passwordTxt" -->
 	<!-- android:layout_centerHorizontal="true" android:layout_marginTop="74dp"> -->
 	<!-- </ImageButton> -->
+	<Button
+		android:id="@+id/loginBtn"
+		android:text="Login"
+		android:textSize="20px"
+		android:layout_height="40dp"
+		android:layout_width="150dp"
+		android:layout_below="@+id/pwTxtBox"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="14dp">
+	</Button>
 
 	<ImageButton
-		android:layout_height="wrap_content"
+		android:id="@+id/registerBtn"
 		android:background="@drawable/register_button"
 		android:layout_width="wrap_content"
-		android:id="@+id/registerBtn"
+		android:layout_height="wrap_content"
 		android:layout_below="@+id/fbLoginBtn"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="28dp">
+		android:layout_marginTop="17dp">
 	</ImageButton>
 
 	<com.ntu.fypshop.FacebookBtn
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
 		android:id="@+id/fbLoginBtn"
 		android:src="@drawable/login_button"
-		android:layout_below="@+id/passwordTxt"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/loginBtn"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="14dp">
+		android:layout_marginTop="41dp">
 	</com.ntu.fypshop.FacebookBtn>
-	
+
+
 </RelativeLayout>
