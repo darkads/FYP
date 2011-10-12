@@ -12,6 +12,8 @@ import com.google.android.maps.Overlay;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,6 +25,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MapResult extends MapActivity{
@@ -31,6 +35,8 @@ public class MapResult extends MapActivity{
 	private LocationListener locationListener;
 	private MapView mapView;
 	private MapController mapController;
+	private Button logout;
+	private static GlobalVariable globalVar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -46,6 +52,9 @@ public class MapResult extends MapActivity{
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 		mapView = (MapView) findViewById(R.id.mapView);
+		logout = (Button) findViewById(R.id.logoutButton);
+		
+		initLogout();
 
 		// enable Street view by default
 		// Problem: Enabling this part triggers cross marks in the map
@@ -62,6 +71,35 @@ public class MapResult extends MapActivity{
 		mapController.setZoom(18);
 	}
 	
+	private void initLogout()
+	{
+		// TODO Auto-generated method stub
+		logout.setOnClickListener(new View.OnClickListener()
+		{			
+			@Override
+			public void onClick(View v)
+			{
+				// TODO Auto-generated method stub
+				// Logout logic here...
+				globalVar = ((GlobalVariable) getApplicationContext());
+				globalVar.setName("");
+				globalVar.setfbBtn(false);
+				globalVar.setHashPw("");
+				globalVar.setEm("");
+
+				SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+				SharedPreferences.Editor editor = login.edit();
+				editor.putString("emailLogin", "");
+				editor.putString("pwLogin", "");
+				editor.commit();
+				
+				Intent intent = new Intent(v.getContext(), LoginPage.class);
+			    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			    startActivity(intent);
+			}
+		});
+	}
+
 	protected boolean isRouteDisplayed() {
         return false;
     }

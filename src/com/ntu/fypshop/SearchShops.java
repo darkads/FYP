@@ -9,39 +9,54 @@ import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
+import com.ntu.fypshop.LoginPage.LogoutRequestListener;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+//import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+//import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
+//import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class SearchShops extends Activity implements OnClickListener {
+public class SearchShops extends Activity {
 
-	
 	private static final String APP_ID = "222592464462347";
 	FbConnect fbConnect;
 
+	private static GlobalVariable globalVar;
 	private TextView name, clothes, others;
-	private UserParticulars userS;
+	private Button logout;
+	// private UserParticulars userS;
 	private String fnameS;
 	private String lnameS;
 	private String nameS;
 	private String emailS;
-	//private String genderS;
-	//private String bdayS;
-
-	//static final int DATE_DIALOG_ID = 0;
-	//private TextView bday;
-	//private Button btn;
-	//private EditText fname;
-
-	//private EditText lname;
+	private Boolean fbBtn;
 	
+	Handler mHandler = new Handler();
+
+	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1;
+
+	// private String genderS;
+	// private String bdayS;
+
+	// static final int DATE_DIALOG_ID = 0;
+	// private TextView bday;
+	// private Button btn;
+	// private EditText fname;
+
+	// private EditText lname;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -58,16 +73,90 @@ public class SearchShops extends Activity implements OnClickListener {
 		name = (TextView) findViewById(R.id.helloTxt);
 		clothes = (TextView) findViewById(R.id.clothes);
 		others = (TextView) findViewById(R.id.others);
-		
-		init();
-		fbConnect = new FbConnect(APP_ID, this, getApplicationContext());
+		logout = (Button) findViewById(R.id.logoutBtn);
+
+		globalVar = ((GlobalVariable) getApplicationContext());
+		fbBtn = globalVar.getfbBtn();
+		Log.d("FbButton: ", fbBtn.toString());
+		if (!fbBtn)
+		{
+			SharedPreferences userDetails = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+			String Uname = userDetails.getString("emailLogin", "");
+			String pass = userDetails.getString("pwLogin", "");
+			Log.d("Uname: ", Uname);
+			Log.d("Password: ", pass);
+			if (Uname == "" && pass.equals(""))
+			{
+				Intent launchLogin = new Intent(this, LoginPage.class);
+				startActivity(launchLogin);
+			}
+			else
+			{
+				ConnectDB connectCheck = new ConnectDB(Uname, pass, 1);
+				if (connectCheck.inputResult())
+				{
+					name.setText("Hello " + connectCheck.getName() + ",");
+					init(INIT_NORM);
+				}
+				else
+				{
+					// do something else
+					Log.d("Authenticate User: ", "False");
+					showDialog(DIALOG_ERR_LOGIN);
+				}
+			}
+		}
+		else
+		{
+			fbConnect = new FbConnect(APP_ID, this, getApplicationContext());
+			init(INIT_FB);
+		}
+
+		// IntentFilter intentFilter = new IntentFilter();
+		// intentFilter.addAction("com.package.ACTION_LOGOUT");
+		// registerReceiver(new BroadcastReceiver()
+		// {
+		//
+		// @Override
+		// public void onReceive(Context context, Intent intent)
+		// {
+		// Log.d("onReceive", "Logout in progress");
+		// // At this point you should start the login activity and finish
+		// // this one
+		// Intent loginIntent = new Intent(SearchShops.this, LoginPage.class);
+		// startActivity(loginIntent);
+		// finish();
+		// }
+		// }, intentFilter);
+
 	}
-	
-	private void init()
+
+	private void init(final int type)
 	{
 		// TODO Auto-generated method stub
-		clothes.setOnClickListener(this);
-		others.setOnClickListener(this);
+		clothes.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(v.getContext(), MapResult.class);
+				startActivity(intent);
+			}
+		});
+		others.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(v.getContext(), MapResult.class);
+				startActivity(intent);
+			}
+		});
+		logout.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				doLogout(type);
+			}
+		});
 	}
 
 	@Override
@@ -78,30 +167,55 @@ public class SearchShops extends Activity implements OnClickListener {
 		fbConnect.getFacebook().authorizeCallback(requestCode, resultCode, data);
 		// }
 	}
-	
-	
-	
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//	    // Handle item selection
-//	    switch (item.getItemId()) {
-//	    case R.id.clothes:
-//	        showResults("Clothes");
-//	        return true;
-//	    case R.id.others:
-//	    	showResults("Others");
-//	        return true;
-//	    default:
-//	        return super.onOptionsItemSelected(item);
-//	    }
-//	}
-	public void onClick(View v)
+
+	private void doLogout(int type)
 	{
-		
-		Intent intent = new Intent(this, MapResult.class);
+		if (type == INIT_NORM)
+		{
+			// Logout logic here...
+			globalVar = ((GlobalVariable) getApplicationContext());
+			globalVar.setName("");
+			globalVar.setfbBtn(false);
+			globalVar.setHashPw("");
+			globalVar.setEm("");
+
+			SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+			SharedPreferences.Editor editor = login.edit();
+			editor.putString("emailLogin", "");
+			editor.putString("pwLogin", "");
+			editor.commit();
+		}
+		else
+		{
+			// Go to login
+			globalVar = ((GlobalVariable) getApplicationContext());
+			Facebook mFacebook = globalVar.getFBState();
+			SessionEvents.onLogoutBegin();
+			AsyncFacebookRunner asyncRunner = new AsyncFacebookRunner(mFacebook);
+			asyncRunner.logout(getApplicationContext(), new LogoutRequestListener());
+		}
+
+		// Return to the login activity
+		Intent intent = new Intent(this, LoginPage.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
-	
+
+	// @Override
+	// public boolean onOptionsItemSelected(MenuItem item) {
+	// // Handle item selection
+	// switch (item.getItemId()) {
+	// case R.id.clothes:
+	// showResults("Clothes");
+	// return true;
+	// case R.id.others:
+	// showResults("Others");
+	// return true;
+	// default:
+	// return super.onOptionsItemSelected(item);
+	// }
+	// }
+
 	public class FbConnect {
 
 		private final String[] FACEBOOK_PERMISSION =
@@ -141,20 +255,20 @@ public class SearchShops extends Activity implements OnClickListener {
 
 		public void login()
 		{
-			GlobalVariable fbBtn = ((GlobalVariable) getApplicationContext());
-			Boolean fbButton = fbBtn.getfbBtn();
-			if (fbButton == true)
+			// GlobalVariable fbBtn = ((GlobalVariable)
+			// getApplicationContext());
+			// Boolean fbButton = fbBtn.getfbBtn();
+			// if (fbButton == true)
+			// {
+			if (!facebook.isSessionValid())
 			{
-				if (!facebook.isSessionValid())
-				{
-					facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
-
-				}
+				facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
 			}
+			// }
 			else
 			{
-				GlobalVariable globalName = ((GlobalVariable) getApplicationContext());
-				name.setText("Hello " + globalName.getName() + ",");
+				globalVar = ((GlobalVariable) getApplicationContext());
+				name.setText("Hello " + globalVar.getName() + ",");
 			}
 		}
 
@@ -194,10 +308,11 @@ public class SearchShops extends Activity implements OnClickListener {
 					lnameS = json.getString("last_name");
 					nameS = fnameS + " " + lnameS;
 					emailS = json.getString("email");
-//					genderS = json.getString("gender");
-//					bdayS = json.getString("birthday");
+					// genderS = json.getString("gender");
+					// bdayS = json.getString("birthday");
 					Log.d("Facebook", fnameS);
-//					userS = new UserParticulars(fnameS, lnameS, emailS, genderS, bdayS);
+					// userS = new UserParticulars(fnameS, lnameS, emailS,
+					// genderS, bdayS);
 					// callback should be run in the original thread,
 					// not the background thread
 					mHandler.post(new Runnable()
@@ -205,25 +320,28 @@ public class SearchShops extends Activity implements OnClickListener {
 						public void run()
 						{
 							name.setText("Hello " + nameS + ",");
-							//fname.setText(fnameS);
-							//lname.setText(lnameS);
-							//email.setText(emailS);
-//							if (genderS.equals("male"))
-//							{
-//								male.setChecked(true);
-//								female.setChecked(false);
-//							}
-//							else if (genderS.equals("female"))
-//							{
-//								female.setChecked(true);
-//								male.setChecked(false);
-//							}
-//							
-//							for (int i = 0; i < 3; i++)
-//							{
-//								bdayInt[i] = getBday(bdayS)[i];
-//							}
-//							bday.setText("Your Birthdate is: " + bdayInt[0] +"/" + bdayInt[1] + "/" + bdayInt[2]);
+							globalVar = ((GlobalVariable) getApplicationContext());
+							globalVar.setName(nameS);
+							// fname.setText(fnameS);
+							// lname.setText(lnameS);
+							// email.setText(emailS);
+							// if (genderS.equals("male"))
+							// {
+							// male.setChecked(true);
+							// female.setChecked(false);
+							// }
+							// else if (genderS.equals("female"))
+							// {
+							// female.setChecked(true);
+							// male.setChecked(false);
+							// }
+							//
+							// for (int i = 0; i < 3; i++)
+							// {
+							// bdayInt[i] = getBday(bdayS)[i];
+							// }
+							// bday.setText("Your Birthdate is: " + bdayInt[0]
+							// +"/" + bdayInt[1] + "/" + bdayInt[2]);
 						}
 					});
 				}
@@ -243,35 +361,52 @@ public class SearchShops extends Activity implements OnClickListener {
 			return this.facebook;
 		}
 
-//		public Integer[] getBday(String b)
-//		{
-//			int mth, day, year;
-//			Integer[] bday = new Integer[3];
-//
-//			String birthday = b;
-//
-//			for (int i = 0; i < 3; i++)
-//			{
-//				bday[i] = 0;
-//			}
-//			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-//			try
-//			{
-//				Date date = sdf.parse(birthday);
-//				Calendar cal = Calendar.getInstance();
-//				cal.setTime(date);
-//				day = (cal.get(Calendar.DAY_OF_MONTH));
-//				mth = (cal.get(Calendar.MONTH));
-//				year = (cal.get(Calendar.YEAR));
-//				bday[0] = day;
-//				bday[1] = mth + 1;
-//				bday[2] = year;
-//			}
-//			catch (ParseException pe)
-//			{
-//				Log.i("Parse Date error: ", "The date povided is invalid.");
-//			}
-//			return bday;
-//		}
+	}
+
+	protected AlertDialog onCreateDialog(int id)
+	{
+		AlertDialog alertDialog;
+		// do the work to define the error Dialog
+		alertDialog = new AlertDialog.Builder(SearchShops.this).create();
+		alertDialog.setTitle("Login Error");
+
+		switch (id)
+		{
+			case DIALOG_ERR_LOGIN:
+				alertDialog.setMessage("Could not authenticate you. Perhaps your details were not saved. Please login again.");
+				break;
+
+			default:
+				alertDialog = null;
+		}
+		alertDialog.setButton("OK", new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int which)
+			{
+
+				// here you can add functions
+				dialog.cancel();
+				Intent launchLogin = new Intent(SearchShops.this, LoginPage.class);
+				startActivity(launchLogin);
+
+			}
+		});
+		return alertDialog;
+	}
+
+	public class LogoutRequestListener extends BaseRequestListener {
+		public void onComplete(String response, final Object state)
+		{
+
+			// callback should be run in the original thread,
+			// not the background thread
+			mHandler.post(new Runnable()
+			{
+				public void run()
+				{
+					SessionEvents.onLogoutFinish();
+				}
+			});
+		}
 	}
 }

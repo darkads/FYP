@@ -10,6 +10,8 @@ public class GlobalVariable extends Application
       private Facebook myFbState = new Facebook(APP_ID);
       private Boolean fbBtn = false;
       private String name = "";
+      private String password = "";
+      private String email = "";
 
       public Facebook getFBState()
       {
@@ -39,5 +41,25 @@ public class GlobalVariable extends Application
       public void setName(String n)
       {
     	  name = n;
+      }
+      
+      public String getHashPw()
+      {
+    	  return password;
+      }
+      
+      public void setHashPw(String p)
+      {
+    	  password = p;
+      }
+      
+      public String getEm()
+      {
+    	  return email;
+      }
+      
+      public void setEm(String em)
+      {
+    	  email = em;
       }
 }//End Class

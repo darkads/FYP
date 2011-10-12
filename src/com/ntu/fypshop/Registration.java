@@ -5,12 +5,16 @@ import java.security.NoSuchAlgorithmException;
 
 import com.facebook.android.AsyncFacebookRunner;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
 public class Registration extends Activity {
+	private static final int DIALOG_ERR_REG = 0;
 	// private int mYear;
 	// private int mMonth;
 	// private int mDay;
@@ -147,15 +151,26 @@ public class Registration extends Activity {
 					connect = new ConnectDB(name.getText().toString(), email.getText().toString(), password.getText().toString());
 					if (connect.inputResult())
 					{
-						GlobalVariable globalName = ((GlobalVariable) getApplicationContext());
-						globalName.setName(name.getText().toString());
+						GlobalVariable globalVar = ((GlobalVariable) getApplicationContext());
+						globalVar.setName(name.getText().toString());
+						globalVar.setfbBtn(false);
+						globalVar.setHashPw(connect.getPassword());
+						globalVar.setEm(email.getText().toString());
+
+						SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+						SharedPreferences.Editor editor = login.edit();
+						editor.putString("emailLogin", globalVar.getEm());
+						editor.putString("pwLogin", globalVar.getHashPw());
+						editor.commit();
 						// TODO Auto-generated method stub
 						Intent intent = new Intent(v.getContext(), SearchShops.class);
+					    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivityForResult(intent, 2);
 					}
 					else
 					{
 						// give error etc.
+						showDialog(DIALOG_ERR_REG);
 					}
 				}
 				catch (NoSuchAlgorithmException e)
@@ -200,4 +215,32 @@ public class Registration extends Activity {
 	// return null;
 	// }
 
+	protected AlertDialog onCreateDialog(int id)
+	{
+		AlertDialog alertDialog;
+		// do the work to define the error Dialog
+		alertDialog = new AlertDialog.Builder(Registration.this).create();
+		alertDialog.setTitle("Registration Error");
+
+		switch (id)
+		{
+			case DIALOG_ERR_REG:
+				alertDialog.setMessage("Unable to register. The email provided has already been registered. Please try again.");
+				break;
+
+			default:
+				alertDialog = null;
+		}
+		alertDialog.setButton("OK", new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int which)
+			{
+
+				// here you can add functions
+				dialog.cancel();
+
+			}
+		});
+		return alertDialog;
+	}
 }

@@ -42,45 +42,75 @@ public class ConnectDB {
 	String salt = "";
 	String name = "";
 	InputStream is = null;
+	String hpw = "";
+	HttpClient client;
 
-	public ConnectDB(String email, String password)
+	public ConnectDB(String email, String password, Integer type)
 	{
-		// the data to send
-		ArrayList<NameValuePair> checkSalt = new ArrayList<NameValuePair>();
-		checkSalt.add(new BasicNameValuePair("email", email));
+		if (type == 0)
+		{
+			// the data to send
+			ArrayList<NameValuePair> checkSalt = new ArrayList<NameValuePair>();
+			checkSalt.add(new BasicNameValuePair("email", email));
 
-		// String response = "";
-		BufferedReader inSalt = null, in = null;
+			// String response = "";
+			BufferedReader inSalt = null;
 
+			try
+			{
+				client = new DefaultHttpClient();
+				HttpPost emailRequest = new HttpPost("http://10.0.2.2/getSalt.php");
+				emailRequest.setEntity(new UrlEncodedFormEntity(checkSalt));
+				HttpResponse emailResponse = client.execute(emailRequest);
+				HttpEntity saltEntity = emailResponse.getEntity();
+				inSalt = new BufferedReader(new InputStreamReader(saltEntity.getContent(), "iso-8859-1"), 8);
+				String bsalt = inSalt.readLine();
+				// JSONTokener tokener = new JSONTokener(bsalt);
+				// JSONArray finalResult = new JSONArray(tokener);
+				JSONObject jsonObj = new JSONObject(bsalt);
+				Log.d("Salt: ", jsonObj.getString("salt"));
+				salt = jsonObj.getString("salt");
+				//name = jsonObj.getString("name");
+				//Log.d("Name: ", name);
+				inSalt.close();
+
+				String hashedPass = new String(getHash(1000, password, salt.getBytes()), "UTF8");
+				Log.d("Hashed Password: ", hashedPass);
+
+				authenticateUser(email, hashedPass);
+
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			authenticateUser(email, password);
+		}
+	}
+
+	private void authenticateUser(String email, String hashedPass)
+	{
+
+		BufferedReader in = null;
+		// TODO Auto-generated method stub
 		try
 		{
-			HttpClient client = new DefaultHttpClient();
-			HttpPost emailRequest = new HttpPost("http://10.0.2.2/getSalt.php");
-			emailRequest.setEntity(new UrlEncodedFormEntity(checkSalt));
-			HttpResponse emailResponse = client.execute(emailRequest);
-			HttpEntity saltEntity = emailResponse.getEntity();
-			inSalt = new BufferedReader(new InputStreamReader(saltEntity.getContent(), "iso-8859-1"), 8);
-			String bsalt = inSalt.readLine();
-			// JSONTokener tokener = new JSONTokener(bsalt);
-			// JSONArray finalResult = new JSONArray(tokener);
-			JSONObject jsonObj = new JSONObject(bsalt);
-			Log.d("Salt: ", jsonObj.getString("salt"));
-			salt = jsonObj.getString("salt");
-			name = jsonObj.getString("name");
-			Log.d("Name: ", name);
-			inSalt.close();
 
-			String hashedPass = new String(getHash(1000, password, salt.getBytes()), "UTF8");
-			Log.d("Hashed Password: ", hashedPass);
+			client = new DefaultHttpClient();
 			ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("email", email));
 			nameValuePairs.add(new BasicNameValuePair("password", hashedPass));
 
+			Log.d("email: ", email);
+			Log.d("pass: ", hashedPass);
 			HttpPost request = new HttpPost("http://10.0.2.2/authenticateUser.php");
 			request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			HttpResponse response = client.execute(request);
 			HttpEntity entity = response.getEntity();
-			in = new BufferedReader(new InputStreamReader(entity.getContent()));
+			in = new BufferedReader(new InputStreamReader(entity.getContent()), 8);
 			// StringBuffer sb = new StringBuffer("");
 			// String line = "";
 			// String NL = System.getProperty("line.separator");
@@ -88,38 +118,25 @@ public class ConnectDB {
 			// {
 			// sb.append(line + NL);
 			// }
-			if (in.readLine() == null)
+			result = in.readLine();
+			if (result == null)
 			{
 				result = "0";
 			}
 			else
 			{
-				result = "1";
+				hpw = hashedPass;
 			}
 			in.close();
+			client.getConnectionManager().shutdown();
 			Log.d("Result: ", result);
 			// result = sb.toString();
 
 			// result = result.replaceAll("\\s+", "");
-
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
-		{
-			if (in != null)
-			{
-				try
-				{
-					in.close();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 
@@ -174,7 +191,17 @@ public class ConnectDB {
 			is.close();
 
 			result = line;// sb.toString();
-			Log.d("Result: ", result);
+			Log.d("Result in ConnectDB: ", result);
+			if(result.equals("1"))
+			{
+				Log.d("HashedPass: ", hashedPass);
+				hpw = hashedPass;
+			}			
+			else
+			{
+				result = "0";
+				Log.d("HashedPass false: ", hashedPass);
+			}
 		}
 
 		catch (Exception exc)
@@ -202,18 +229,25 @@ public class ConnectDB {
 
 	public String getName()
 	{
-		return name;
+		return result;
+	}
+
+	public String getPassword()
+	{
+		return hpw;
 	}
 
 	public Boolean inputResult()
 	{
-		if (result.equals("1"))
-		{			
-			return true;
+		if (result == "0")
+		{
+			name = "";
+			return false;
 		}
 		else
 		{
-			return false;
+			name = result;
+			return true;
 		}
 	}
 

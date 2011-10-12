@@ -23,7 +23,7 @@
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/loginTxt"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="27dp">
+		android:layout_marginTop="20dp">
 	</ImageView>
 
 	<EditText
@@ -32,7 +32,7 @@
 		android:id="@+id/emailTxtBox"
 		android:layout_below="@+id/imageView1"
 		android:layout_toRightOf="@+id/emailTxt"
-		android:layout_marginTop="28dp"
+		android:layout_marginTop="20dp"
 		android:textSize="17px"
 		android:paddingBottom="5dp"
 		android:paddingLeft="5dp"
@@ -70,7 +70,7 @@
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/emailTxtBox"
 		android:layout_alignRight="@+id/emailTxt"
-		android:layout_marginTop="27dp">
+		android:layout_marginTop="15dp">
 	</TextView>
 
 	<TextView
@@ -81,7 +81,7 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="28dp">
+		android:layout_marginTop="20dp">
 	</TextView>
 
 	<!-- <ImageButton android:src="@drawable/signin_twitter_button" -->
@@ -89,16 +89,6 @@
 	<!-- android:layout_below="@+id/passwordTxt" -->
 	<!-- android:layout_centerHorizontal="true" android:layout_marginTop="74dp"> -->
 	<!-- </ImageButton> -->
-	<Button
-		android:id="@+id/loginBtn"
-		android:text="Login"
-		android:textSize="20px"
-		android:layout_height="40dp"
-		android:layout_width="150dp"
-		android:layout_below="@+id/pwTxtBox"
-		android:layout_centerHorizontal="true"
-		android:layout_marginTop="14dp">
-	</Button>
 
 	<ImageButton
 		android:id="@+id/registerBtn"
@@ -111,14 +101,26 @@
 	</ImageButton>
 
 	<com.ntu.fypshop.FacebookBtn
-		android:id="@+id/fbLoginBtn"
-		android:src="@drawable/login_button"
 		android:layout_width="wrap_content"
+		android:id="@+id/fbLoginBtn"
 		android:layout_height="wrap_content"
+		android:src="@drawable/login_button"
 		android:layout_below="@+id/loginBtn"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="41dp">
+		android:layout_marginTop="15dp">
 	</com.ntu.fypshop.FacebookBtn>
+
+	<Button
+		android:textSize="15px"
+		android:layout_width="150dp"
+		android:text="Login"
+		android:id="@+id/loginBtn"
+		android:layout_height="38dp"
+		android:layout_below="@+id/pwTxtBox"
+		android:layout_toRightOf="@+id/passwordTxt"
+		android:layout_marginTop="15dp">
+	</Button>
+
 
 
 </RelativeLayout>
