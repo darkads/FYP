@@ -42,6 +42,7 @@ public class SearchShops extends Activity {
 	private String nameS;
 	private String emailS;
 	private Boolean fbBtn;
+	private Facebook facebook;
 	
 	Handler mHandler = new Handler();
 
@@ -77,8 +78,10 @@ public class SearchShops extends Activity {
 
 		globalVar = ((GlobalVariable) getApplicationContext());
 		fbBtn = globalVar.getfbBtn();
+		facebook = globalVar.getFBState();
+		
 		Log.d("FbButton: ", fbBtn.toString());
-		if (!fbBtn)
+		if (!fbBtn && !facebook.isSessionValid())
 		{
 			SharedPreferences userDetails = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 			String Uname = userDetails.getString("emailLogin", "");
@@ -162,6 +165,7 @@ public class SearchShops extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
+		super.onActivityResult(requestCode, resultCode, data);
 		// if (requestCode != 0)
 		// {
 		fbConnect.getFacebook().authorizeCallback(requestCode, resultCode, data);
@@ -224,10 +228,11 @@ public class SearchShops extends Activity {
 		private Context context;
 		private Activity activity;
 		private Handler mHandler;
-		private Facebook facebook;
+		private Facebook facebook = new Facebook(APP_ID);
 		GlobalVariable FbState = ((GlobalVariable) getApplicationContext());
 
 		// private SessionListener mSessionListener = new SessionListener();
+		
 
 		public FbConnect(String appId, Activity activity, Context context)
 		{
@@ -235,13 +240,35 @@ public class SearchShops extends Activity {
 			this.context = context;
 			this.mHandler = new Handler();
 			this.activity = activity;
+			globalVar = ((GlobalVariable) getApplicationContext());
 
-			facebook = FbState.getFBState();
+			SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this); 
+            String access_token = prefs.getString("access_token", null); 
+            Long expires = prefs.getLong("access_expires", -1);
+            String sharedName = prefs.getString("name", "");
+
+
+            if (access_token != null && expires != -1)
+            {
+                facebook.setAccessToken(access_token);
+                facebook.setAccessExpires(expires);
+            }
+
+
+            if (!facebook.isSessionValid() || sharedName.equals(""))
+            {
+                facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
+            }
+            else
+			{
+				name.setText("Hello " + sharedName + ",");
+			}
+			//facebook = FbState.getFBState();
 			// if (!facebook.isSessionValid())
 			// {
 			// facebook = new Facebook(APP_ID);
 			// FbState.setFbState(facebook);
-			login();
+			//login();
 			// }
 			// else
 			// {
@@ -253,24 +280,24 @@ public class SearchShops extends Activity {
 
 		}
 
-		public void login()
-		{
-			// GlobalVariable fbBtn = ((GlobalVariable)
-			// getApplicationContext());
-			// Boolean fbButton = fbBtn.getfbBtn();
-			// if (fbButton == true)
-			// {
-			if (!facebook.isSessionValid())
-			{
-				facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
-			}
-			// }
-			else
-			{
-				globalVar = ((GlobalVariable) getApplicationContext());
-				name.setText("Hello " + globalVar.getName() + ",");
-			}
-		}
+//		public void login()
+//		{
+//			// GlobalVariable fbBtn = ((GlobalVariable)
+//			// getApplicationContext());
+//			// Boolean fbButton = fbBtn.getfbBtn();
+//			// if (fbButton == true)
+//			// {
+//			if (!facebook.isSessionValid())
+//			{
+//				facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
+//			}
+//			// }
+//			else
+//			{
+//				globalVar = ((GlobalVariable) getApplicationContext());
+//				name.setText("Hello " + globalVar.getName() + ",");
+//			}
+//		}
 
 		private final class LoginDialogListener implements DialogListener {
 			public void onComplete(Bundle values)
@@ -313,6 +340,8 @@ public class SearchShops extends Activity {
 					Log.d("Facebook", fnameS);
 					// userS = new UserParticulars(fnameS, lnameS, emailS,
 					// genderS, bdayS);
+					
+					
 					// callback should be run in the original thread,
 					// not the background thread
 					mHandler.post(new Runnable()
@@ -320,8 +349,19 @@ public class SearchShops extends Activity {
 						public void run()
 						{
 							name.setText("Hello " + nameS + ",");
-							globalVar = ((GlobalVariable) getApplicationContext());
-							globalVar.setName(nameS);
+//							globalVar = ((GlobalVariable) getApplicationContext());
+//							globalVar.setName(nameS);
+							
+							String token = facebook.getAccessToken();
+							long token_expires = facebook.getAccessExpires();
+
+							SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
+
+							prefs.edit().putLong("access_expires", token_expires).commit();
+
+							prefs.edit().putString("access_token", token).commit();
+							
+							prefs.edit().putString("name", nameS).commit();
 							// fname.setText(fnameS);
 							// lname.setText(lnameS);
 							// email.setText(emailS);
