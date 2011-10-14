@@ -9,7 +9,6 @@ import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
-import com.ntu.fypshop.LoginPage.LogoutRequestListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -228,7 +227,7 @@ public class SearchShops extends Activity {
 		private Context context;
 		private Activity activity;
 		private Handler mHandler;
-		private Facebook facebook = new Facebook(APP_ID);
+		private Facebook facebook;
 		GlobalVariable FbState = ((GlobalVariable) getApplicationContext());
 
 		// private SessionListener mSessionListener = new SessionListener();
@@ -242,33 +241,33 @@ public class SearchShops extends Activity {
 			this.activity = activity;
 			globalVar = ((GlobalVariable) getApplicationContext());
 
-			SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this); 
-            String access_token = prefs.getString("access_token", null); 
-            Long expires = prefs.getLong("access_expires", -1);
-            String sharedName = prefs.getString("name", "");
+//			SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this); 
+//            String access_token = prefs.getString("access_token", null); 
+//            Long expires = prefs.getLong("access_expires", -1);
+//            String sharedName = prefs.getString("name", "");
+//
+//
+//            if (access_token != null && expires != -1)
+//            {
+//                facebook.setAccessToken(access_token);
+//                facebook.setAccessExpires(expires);
+//            }
 
 
-            if (access_token != null && expires != -1)
-            {
-                facebook.setAccessToken(access_token);
-                facebook.setAccessExpires(expires);
-            }
-
-
-            if (!facebook.isSessionValid() || sharedName.equals(""))
-            {
-                facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
-            }
-            else
-			{
-				name.setText("Hello " + sharedName + ",");
-			}
-			//facebook = FbState.getFBState();
+//            if (!facebook.isSessionValid() || sharedName.equals(""))
+//            {
+//                facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
+//            }
+//            else
+//			{
+//				name.setText("Hello " + sharedName + ",");
+//			}
+			facebook = FbState.getFBState();
 			// if (!facebook.isSessionValid())
 			// {
 			// facebook = new Facebook(APP_ID);
 			// FbState.setFbState(facebook);
-			//login();
+			login();
 			// }
 			// else
 			// {
@@ -280,24 +279,24 @@ public class SearchShops extends Activity {
 
 		}
 
-//		public void login()
-//		{
-//			// GlobalVariable fbBtn = ((GlobalVariable)
-//			// getApplicationContext());
-//			// Boolean fbButton = fbBtn.getfbBtn();
-//			// if (fbButton == true)
-//			// {
-//			if (!facebook.isSessionValid())
-//			{
-//				facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
-//			}
-//			// }
-//			else
-//			{
+		public void login()
+		{
+			// GlobalVariable fbBtn = ((GlobalVariable)
+			// getApplicationContext());
+			// Boolean fbButton = fbBtn.getfbBtn();
+			// if (fbButton == true)
+			// {
+			if (!facebook.isSessionValid())
+			{
+				facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
+			}
+			// }
+			else
+			{
 //				globalVar = ((GlobalVariable) getApplicationContext());
-//				name.setText("Hello " + globalVar.getName() + ",");
-//			}
-//		}
+				name.setText("Hello " + globalVar.getName() + ",");
+			}
+		}
 
 		private final class LoginDialogListener implements DialogListener {
 			public void onComplete(Bundle values)
@@ -320,6 +319,9 @@ public class SearchShops extends Activity {
 			public void onCancel()
 			{
 				SessionEvents.onLoginError("Action Canceled");
+				Intent intent = new Intent(context, LoginPage.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
 			}
 		}
 
@@ -352,16 +354,16 @@ public class SearchShops extends Activity {
 //							globalVar = ((GlobalVariable) getApplicationContext());
 //							globalVar.setName(nameS);
 							
-							String token = facebook.getAccessToken();
-							long token_expires = facebook.getAccessExpires();
+//							String token = facebook.getAccessToken();
+//							long token_expires = facebook.getAccessExpires();
 
-							SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
-
-							prefs.edit().putLong("access_expires", token_expires).commit();
-
-							prefs.edit().putString("access_token", token).commit();
-							
-							prefs.edit().putString("name", nameS).commit();
+//							SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
+//
+//							prefs.edit().putLong("access_expires", token_expires).commit();
+//
+//							prefs.edit().putString("access_token", token).commit();
+//							
+//							prefs.edit().putString("name", nameS).commit();
 							// fname.setText(fnameS);
 							// lname.setText(lnameS);
 							// email.setText(emailS);
