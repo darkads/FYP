@@ -12,6 +12,7 @@ public class GlobalVariable extends Application
       private String name = "";
       private String password = "";
       private String email = "";
+      private Integer searchType = 0;
 
       public Facebook getFBState()
       {
@@ -61,5 +62,15 @@ public class GlobalVariable extends Application
       public void setEm(String em)
       {
     	  email = em;
+      }
+      
+      public void setSearchType(Integer st)
+      {
+    	  searchType = st;
+      }
+      
+      public Integer getSearchType()
+      {
+    	  return searchType;
       }
 }//End Class

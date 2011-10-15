@@ -1,19 +1,21 @@
 package com.ntu.fypshop;
 
 import java.io.IOException;
+//import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
 import com.google.android.maps.GeoPoint;
+//import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
-import com.ntu.fypshop.SearchShops.LogoutRequestListener;
+//import com.google.android.maps.OverlayItem;
+import com.ntu.fypshop.ConnectDB.MyVO;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
+//import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -35,7 +38,8 @@ import android.widget.Toast;
 
 public class MapResult extends MapActivity {
 
-	private static final int INIT_NORM = 0, INIT_FB = 1;
+	private static final Integer INIT_NORM = 0, INIT_FB = 1;
+	private static final Integer MY_POINT = 0, STORES_LOC = 1;
 	private LocationManager locationManager;
 	private LocationListener locationListener;
 	private MapView mapView;
@@ -45,6 +49,8 @@ public class MapResult extends MapActivity {
 	Handler mHandler = new Handler();
 
 	private Boolean fbBtn;
+
+	// List<MyVO> myVO;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -99,21 +105,22 @@ public class MapResult extends MapActivity {
 
 				// TODO Auto-generated method stub
 				// Logout logic here...
-//				globalVar = ((GlobalVariable) getApplicationContext());
-//				globalVar.setName("");
-//				globalVar.setfbBtn(false);
-//				globalVar.setHashPw("");
-//				globalVar.setEm("");
-//
-//				SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
-//				SharedPreferences.Editor editor = login.edit();
-//				editor.putString("emailLogin", "");
-//				editor.putString("pwLogin", "");
-//				editor.commit();
-//
-//				Intent intent = new Intent(v.getContext(), LoginPage.class);
-//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//				startActivity(intent);
+				// globalVar = ((GlobalVariable) getApplicationContext());
+				// globalVar.setName("");
+				// globalVar.setfbBtn(false);
+				// globalVar.setHashPw("");
+				// globalVar.setEm("");
+				//
+				// SharedPreferences login =
+				// getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+				// SharedPreferences.Editor editor = login.edit();
+				// editor.putString("emailLogin", "");
+				// editor.putString("pwLogin", "");
+				// editor.commit();
+				//
+				// Intent intent = new Intent(v.getContext(), LoginPage.class);
+				// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				// startActivity(intent);
 				doLogout(type);
 			}
 		});
@@ -158,13 +165,16 @@ public class MapResult extends MapActivity {
 	}
 
 	private class GPSLocationListener implements LocationListener {
+
+		GlobalVariable globalVar = ((GlobalVariable) getApplicationContext());
+
+		// private ArrayList<Markers> mapOverlays = new ArrayList<Markers>();
 		@Override
 		public void onLocationChanged(Location location)
 		{
 			if (location != null)
 			{
 				GeoPoint point = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
-
 				/*
 				 * Toast.makeText(getBaseContext(), "Latitude: " +
 				 * location.getLatitude() + " Longitude: " +
@@ -175,14 +185,47 @@ public class MapResult extends MapActivity {
 				mapController.setZoom(18);
 
 				// add marker
-				MapOverlay mapOverlay = new MapOverlay();
+				MapOverlay mapOverlay = new MapOverlay(MY_POINT);
 				mapOverlay.setPointToDraw(point);
 				List<Overlay> listOfOverlays = mapView.getOverlays();
 				listOfOverlays.clear();
 				listOfOverlays.add(mapOverlay);
 
 				String address = ConvertPointToLocation(point);
-				Toast.makeText(getBaseContext(), address, Toast.LENGTH_SHORT).show();
+				Toast.makeText(MapResult.this, address, Toast.LENGTH_LONG).show();
+
+				// Drawable drawable =
+				// getResources().getDrawable(R.drawable.red);
+
+				if (globalVar.getSearchType() == 1)
+				{
+					ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, 500);
+
+					Log.d("Store Location Results in activity: ", connect.storeLocResult());
+					// Markers usersMarker = new
+					// Markers(drawable,MapResult.this);
+					for (MyVO vo : connect.getMyVO())
+					{
+						Log.d("VO address: ", vo.address);
+						Log.d("VO name: ", vo.name);
+						Log.d("VO lat: ", vo.lat);
+						Log.d("VO lng: ", vo.lng);
+						Log.d("VO distance: ", vo.distance);
+
+						GeoPoint p = new GeoPoint((int) (Double.parseDouble(vo.lat) * 1E6), (int) (Double.parseDouble(vo.lng) * 1E6));
+						// Log.d("VO lat after geopoint: ",Integer.toString(((int)
+						// (Double.parseDouble(vo.lat) * 1E6))));
+						// OverlayItem item = new OverlayItem(p,"Testing Title",
+						// "Testing Description");
+						// item.setMarker(drawable);
+						// usersMarker.addOverlay(item);
+						MapOverlay mapOverlay2 = new MapOverlay(STORES_LOC);
+						mapOverlay2.setPointToDraw(p);
+						listOfOverlays.add(mapOverlay2);
+					}
+				}
+
+				// mapOverlays.add(usersMarker);
 
 				mapView.invalidate();
 			}
@@ -191,7 +234,7 @@ public class MapResult extends MapActivity {
 		public String ConvertPointToLocation(GeoPoint point)
 		{
 			String address = "";
-			Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
+			Geocoder geoCoder = new Geocoder(MapResult.this, Locale.getDefault());
 			try
 			{
 				List<Address> addresses = geoCoder.getFromLocation(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, 1);
@@ -249,6 +292,19 @@ public class MapResult extends MapActivity {
 
 	class MapOverlay extends Overlay {
 		private GeoPoint pointToDraw;
+		private Integer drawIcon;
+
+		public MapOverlay(Integer type)
+		{
+			if (type == MY_POINT)
+			{
+				drawIcon = R.drawable.red;
+			}
+			else if (type == STORES_LOC)
+			{
+				drawIcon = R.drawable.marker;
+			}
+		}
 
 		public void setPointToDraw(GeoPoint point)
 		{
@@ -270,8 +326,8 @@ public class MapResult extends MapActivity {
 			mapView.getProjection().toPixels(pointToDraw, screenPts);
 
 			// add marker
-			Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.red);
-			canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 24, null); // 24
+			Bitmap bmp = BitmapFactory.decodeResource(getResources(), drawIcon);
+			canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 15, null); // 15
 																			// is
 																			// the
 																			// height
@@ -296,4 +352,66 @@ public class MapResult extends MapActivity {
 			});
 		}
 	}
+
+	// public class Markers extends ItemizedOverlay<OverlayItem> {
+	//
+	// private Context ctx;
+	//
+	// private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
+	//
+	// public Markers(Drawable defaultMarker, Context cont)
+	// {
+	//
+	// super(boundCenterBottom(defaultMarker));
+	// this.ctx = cont;
+	// // TODO Auto-generated constructor stub
+	// }
+	//
+	// @Override
+	// protected OverlayItem createItem(int i)
+	// {
+	// // TODO Auto-generated method stub
+	// return mOverlays.get(i);
+	// }
+	//
+	// @Override
+	// public boolean onTap(GeoPoint p, MapView mapView)
+	// {
+	// // TODO Auto-generated method stub
+	// return super.onTap(p, mapView);
+	// }
+	//
+	// @Override
+	// protected boolean onTap(int index)
+	// {
+	// // TODO Auto-generated method stub
+	// // Toast.makeText(this.ctx,
+	// // mOverlays.get(index).getTitle().toString() + ", Latitude: " +
+	// // mOverlays.get(index).getPoint().getLatitudeE6(),
+	// // Toast.LENGTH_SHORT).show();
+	// return super.onTap(index);
+	// }
+	//
+	// @Override
+	// public int size()
+	// {
+	// // TODO Auto-generated method stub
+	// return mOverlays.size();
+	// }
+	//
+	// public void addOverlay(OverlayItem item)
+	// {
+	// mOverlays.add(item);
+	// setLastFocusedIndex(-1);
+	// populate();
+	//
+	// }
+	//
+	// public void clear()
+	// {
+	// mOverlays.clear();
+	// setLastFocusedIndex(-1);
+	// populate();
+	// }
+	// }
 }

@@ -1,20 +1,21 @@
 package com.ntu.fypshop;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+//import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+//import java.sql.Connection;
+//import java.sql.PreparedStatement;
+//import java.sql.ResultSet;
+//import java.sql.SQLException;
+//import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
+//import java.util.Arrays;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,25 +26,28 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.commons.codec.binary.Base64;
+//import org.json.JSONArray;
+//import org.json.JSONException;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
+//import org.json.JSONTokener;
 
-import com.facebook.android.Util;
+//import com.facebook.android.Util;
 
 import android.util.Log;
 
 public class ConnectDB {
 
-	private JSONArray jArray;
-	private Boolean flag;
+	// private JSONArray jArray;
+	// private Boolean flag;
 	String result = "";
 	String salt = "";
 	String name = "";
 	InputStream is = null;
 	String hpw = "";
 	HttpClient client;
+
+	List<MyVO> vos;
 
 	public ConnectDB(String email, String password, Integer type)
 	{
@@ -70,8 +74,8 @@ public class ConnectDB {
 				JSONObject jsonObj = new JSONObject(bsalt);
 				Log.d("Salt: ", jsonObj.getString("salt"));
 				salt = jsonObj.getString("salt");
-				//name = jsonObj.getString("name");
-				//Log.d("Name: ", name);
+				// name = jsonObj.getString("name");
+				// Log.d("Name: ", name);
 				inSalt.close();
 
 				String hashedPass = new String(getHash(1000, password, salt.getBytes()), "UTF8");
@@ -192,11 +196,11 @@ public class ConnectDB {
 
 			result = line;// sb.toString();
 			Log.d("Result in ConnectDB: ", result);
-			if(result.equals("1"))
+			if (result.equals("1"))
 			{
 				Log.d("HashedPass: ", hashedPass);
 				hpw = hashedPass;
-			}			
+			}
 			else
 			{
 				result = "0";
@@ -227,6 +231,83 @@ public class ConnectDB {
 		// }
 	}
 
+	public ConnectDB(Double lat, Double lng, Integer radius)
+	{
+		// the data to send
+		ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+		nameValuePairs.add(new BasicNameValuePair("lat", Double.toString(lat)));
+		nameValuePairs.add(new BasicNameValuePair("lng", Double.toString(lng)));
+		nameValuePairs.add(new BasicNameValuePair("radius", Integer.toString(radius)));
+		// http post
+		try
+		{
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost("http://10.0.2.2/storeLocations.php");
+
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			HttpResponse response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			is = entity.getContent();
+		}
+
+		catch (Exception ex)
+		{
+			Log.e("log_tag", "Error in http connection " + ex.toString());
+		}
+		// convert response to string
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+			StringBuilder sb = new StringBuilder();
+			String line = reader.readLine();
+			while(line != null)
+			{
+				sb.append(line).append("\n");
+				line = reader.readLine();
+			}
+			String result1 = sb.toString();
+			Log.d("testing line: ", result1);
+			JSONObject jsonObj = null;//new JSONObject(line);
+			vos = new ArrayList<MyVO>();
+			JSONArray jArray = new JSONArray(result1);
+			for (int i = 0; i < jArray.length(); i++)
+			{
+				jsonObj = jArray.getJSONObject(i);
+				vos.add(new MyVO(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng"), jsonObj.getString("distance")));
+			}
+//			JSONArray values = jsonObj.getJSONArray("row");
+//			for (int i = 0; i < values.length(); i++)
+//			{
+//				Log.d("address: ", values.getJSONObject(i).getString("address"));
+//				Log.d("name: ", values.getJSONObject(i).getString("name"));
+//				Log.d("lat: ", values.getJSONObject(i).getString("lat"));
+//				Log.d("lng: ", values.getJSONObject(i).getString("lng"));
+//				Log.d("distance: ", values.getJSONObject(i).getString("distance"));
+//			}
+			// while ((line = reader.readLine()) != null)
+			// {
+			// sb.append(line + "\n");
+			// }
+			is.close();
+
+			result = jsonObj.getString("address");// sb.toString();
+			Log.d("Result in ConnectDB for locations: ", result);
+			// if (result.equals("1"))
+			// {
+			// storeLocResult(1);
+			// }
+			// else
+			// {
+			// storeLocResult(0);
+			// }
+		}
+
+		catch (Exception exc)
+		{
+			Log.e("log_tag", "Error converting result " + exc.toString());
+		}
+	}
+
 	public String getName()
 	{
 		return result;
@@ -251,6 +332,18 @@ public class ConnectDB {
 		}
 	}
 
+	public String storeLocResult()
+	{
+		if (result != null)
+		{
+			return result;
+		}
+		else
+		{
+			return "null";
+		}
+	}
+
 	public byte[] getHash(int iterationNb, String password, byte[] salt) throws NoSuchAlgorithmException, UnsupportedEncodingException
 	{
 		MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -263,6 +356,28 @@ public class ConnectDB {
 			input = digest.digest(input);
 		}
 		return Base64.encodeBase64(input);
+	}
+	
+	public List<MyVO> getMyVO()
+	{
+		return vos;
+	}
+
+	public class MyVO {
+		final public String address;
+		final public String name;
+		final public String lat;
+		final public String lng;
+		final public String distance;
+
+		public MyVO(String add, String nm, String lt, String lg, String dt)
+		{
+			address = add;
+			name = nm;
+			lat = lt;
+			lng = lg;
+			distance = dt;
+		}
 	}
 
 }

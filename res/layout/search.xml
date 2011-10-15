@@ -16,6 +16,16 @@
 		android:layout_height="fill_parent" android:layout_width="fill_parent" android:clickable="true"> 
 		</ListView> -->
 	<TextView
+		android:text="Departmental Stores"
+		android:id="@+id/departmentalstores"
+		android:gravity="center_vertical"
+		android:clickable="true"
+		android:layout_width="match_parent"
+		android:layout_height="30dp">
+	</TextView>
+
+
+	<TextView
 		android:text="Clothes"
 		android:id="@+id/clothes"
 		android:layout_height="30dp"

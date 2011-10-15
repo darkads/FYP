@@ -20,7 +20,7 @@ import android.content.SharedPreferences;
 //import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+//import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 //import android.view.View.OnClickListener;
@@ -33,13 +33,13 @@ public class SearchShops extends Activity {
 	FbConnect fbConnect;
 
 	private static GlobalVariable globalVar;
-	private TextView name, clothes, others;
+	private TextView name, departmentalStores, clothes, others;
 	private Button logout;
 	// private UserParticulars userS;
 	private String fnameS;
 	private String lnameS;
 	private String nameS;
-	private String emailS;
+	//private String emailS;
 	private Boolean fbBtn;
 	private Facebook facebook;
 	
@@ -71,6 +71,7 @@ public class SearchShops extends Activity {
 		}
 
 		name = (TextView) findViewById(R.id.helloTxt);
+		departmentalStores = (TextView) findViewById(R.id.departmentalstores);
 		clothes = (TextView) findViewById(R.id.clothes);
 		others = (TextView) findViewById(R.id.others);
 		logout = (Button) findViewById(R.id.logoutBtn);
@@ -135,11 +136,22 @@ public class SearchShops extends Activity {
 
 	private void init(final int type)
 	{
+		globalVar = ((GlobalVariable) getApplicationContext());
 		// TODO Auto-generated method stub
+		departmentalStores.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				globalVar.setSearchType(1);
+				Intent intent = new Intent(v.getContext(), MapResult.class);
+				startActivity(intent);
+			}
+		});
 		clothes.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v)
 			{
+				globalVar.setSearchType(2);
 				Intent intent = new Intent(v.getContext(), MapResult.class);
 				startActivity(intent);
 			}
@@ -148,6 +160,7 @@ public class SearchShops extends Activity {
 		{
 			public void onClick(View v)
 			{
+				globalVar.setSearchType(3);
 				Intent intent = new Intent(v.getContext(), MapResult.class);
 				startActivity(intent);
 			}
@@ -336,7 +349,7 @@ public class SearchShops extends Activity {
 					fnameS = json.getString("first_name");
 					lnameS = json.getString("last_name");
 					nameS = fnameS + " " + lnameS;
-					emailS = json.getString("email");
+					//emailS = json.getString("email");
 					// genderS = json.getString("gender");
 					// bdayS = json.getString("birthday");
 					Log.d("Facebook", fnameS);
