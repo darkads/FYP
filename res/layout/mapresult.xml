@@ -5,11 +5,10 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 	<RelativeLayout
-		android:layout_width="300dp"
-		android:layout_height="300dp"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
 		android:layout_alignParentTop="true"
 		android:layout_centerHorizontal="true"
-		android:layout_marginTop="14dp"
 		android:id="@+id/relativeLayout1">
 		<com.google.android.maps.MapView
 			android:id="@+id/mapView"
@@ -17,16 +16,16 @@
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
 			android:apiKey="0fJKoBXvkjaxqXZ_loYfQEEXmINxngMMjOROQSQ" />
+
 	</RelativeLayout>
-	
 	<Button
-		android:layout_width="wrap_content"
-		android:text="Logout"
-		android:id="@+id/logoutButton"
-		android:layout_height="wrap_content"
-		android:layout_below="@+id/relativeLayout1"
-		android:layout_alignRight="@+id/relativeLayout1"
-		android:layout_marginTop="27dp">
+	android:layout_width="wrap_content"
+	android:text="Logout"
+	android:textSize="8px"
+	android:layout_height="30dp"
+	android:id="@+id/logoutButton"
+	android:layout_alignParentTop="true"
+	android:layout_alignParentRight="true">
 	</Button>
 
 </RelativeLayout>
