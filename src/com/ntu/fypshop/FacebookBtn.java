@@ -1,24 +1,13 @@
 package com.ntu.fypshop;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
-import com.facebook.android.FacebookError;
-import com.facebook.android.Util;
-import com.facebook.android.Facebook.DialogListener;
 import com.ntu.fypshop.SessionEvents.AuthListener;
 import com.ntu.fypshop.SessionEvents.LogoutListener;
 
@@ -26,18 +15,18 @@ public class FacebookBtn extends ImageButton {
 
 	// private static final String APP_ID = "222592464462347";
 	private Facebook facebook;
-	private static GlobalVariable applicationcontext;
+//	private static GlobalVariable applicationcontext;
 	private Context context;
-	private String[] permissions;
-	private Handler mHandler;
-	private Activity activity;
-
-	private UserParticulars userS;
-	private String fnameS;
-	private String lnameS;
-	private String emailS;
-	private String genderS;
-	private String bdayS;
+//	private String[] permissions;
+//	private Handler mHandler;
+//	private Activity activity;
+//
+//	private UserParticulars userS;
+//	private String fnameS;
+//	private String lnameS;
+//	private String emailS;
+//	private String genderS;
+//	private String bdayS;
 
 	private SessionListener mSessionListener = new SessionListener();
 

@@ -28,25 +28,15 @@ public class LoginPage extends Activity {
 	// private static final String[] FACEBOOK_PERMISSION =
 	// { "user_birthday", "email" };
 
-	// private final Handler mFacebookHandler = new Handler();
-
 	private FacebookBtn fblogin;
 	private static GlobalVariable globalVar;
 	private Facebook mFacebook;
-	// private AsyncFacebookRunner mAsyncRunner;
 	private ImageButton regBtn;
 	private Button login;
 	private EditText email, password;
 
 	Handler mHandler = new Handler();
-	static final int DIALOG_ERR_LOGIN = 0;// , DIALOG_ERR = 1;
-
-	// private UserParticulars user;
-	// private String fname;
-	// private String lname;
-	// private String email;
-	// private String gender;
-	// private String bday;
+	static final int DIALOG_ERR_LOGIN = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -156,9 +146,7 @@ public class LoginPage extends Activity {
 					Intent intent = new Intent(v.getContext(), SearchShops.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					Log.d("GlobalVariable name: ", globalVar.getName());
-					// startActivityForResult means that Activity1 can expect
-					// info
-					// back from Activity2.
+					// startActivityForResult means that Activity1 can expect info back from Activity2.
 					startActivityForResult(intent, 0);
 				}
 				else

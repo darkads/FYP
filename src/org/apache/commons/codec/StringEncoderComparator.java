@@ -27,22 +27,12 @@ import java.util.Comparator;
  * @author Apache Software Foundation
  * @version $Id: StringEncoderComparator.java 1080701 2011-03-11 17:52:27Z ggregory $
  */
-public class StringEncoderComparator implements Comparator {
+public class StringEncoderComparator implements Comparator<Object> {
 
     /**
      * Internal encoder instance.
      */
     private final StringEncoder stringEncoder;
-
-    /**
-     * Constructs a new instance.
-     * 
-     * @deprecated Creating an instance without a {@link StringEncoder} leads to a {@link NullPointerException}. Will be
-     *             removed in 2.0.
-     */
-    public StringEncoderComparator() {
-        this.stringEncoder = null; // Trying to use this will cause things to break
-    }
 
     /**
      * Constructs a new instance with the given algorithm.
@@ -72,8 +62,10 @@ public class StringEncoderComparator implements Comparator {
         int compareCode = 0;
 
         try {
-            Comparable s1 = (Comparable) this.stringEncoder.encode(o1);
-            Comparable s2 = (Comparable) this.stringEncoder.encode(o2);
+            @SuppressWarnings("unchecked")
+			Comparable<Object> s1 = (Comparable<Object>) this.stringEncoder.encode(o1);
+            @SuppressWarnings("unchecked")
+			Comparable<Object> s2 = (Comparable<Object>) this.stringEncoder.encode(o2);
             compareCode = s1.compareTo(s2);
         } catch (EncoderException ee) {
             compareCode = 0;

@@ -52,21 +52,24 @@ public final class R {
         public static final int cfmPwTxt=0x7f050018;
         public static final int cfmPwTxtBox=0x7f050019;
         public static final int close_img_button=0x7f050004;
-        public static final int clothes=0x7f05001d;
-        public static final int departmentalstores=0x7f05001c;
+        public static final int clothes=0x7f050023;
+        public static final int departmentalstores=0x7f050022;
         public static final int emailTxt=0x7f05000a;
         public static final int emailTxtBox=0x7f050009;
         public static final int fbLoginBtn=0x7f05000e;
+        public static final int genSearchBtn=0x7f050020;
         public static final int helloTxt=0x7f05001b;
         public static final int imageView1=0x7f050008;
+        public static final int itemsRadio=0x7f05001f;
+        public static final int locSearchBtn=0x7f050021;
         public static final int loginBtn=0x7f05000f;
         public static final int loginTxt=0x7f050006;
-        public static final int logoutBtn=0x7f05001f;
+        public static final int logoutBtn=0x7f050025;
         public static final int logoutButton=0x7f050012;
         public static final int mapView=0x7f050011;
         public static final int nameTxt=0x7f050015;
         public static final int nameTxtBox=0x7f050016;
-        public static final int others=0x7f05001e;
+        public static final int others=0x7f050024;
         public static final int passwordTxt=0x7f05000c;
         public static final int passwordTxtBox=0x7f050017;
         public static final int pwTxtBox=0x7f05000b;
@@ -75,6 +78,9 @@ public final class R {
         public static final int registerTxt=0x7f050014;
         public static final int reglayout=0x7f050013;
         public static final int relativeLayout1=0x7f050010;
+        public static final int searchText=0x7f05001c;
+        public static final int searchTypeRadio=0x7f05001d;
+        public static final int shopsRadio=0x7f05001e;
         public static final int welcomeTxt=0x7f050007;
     }
     public static final class layout {

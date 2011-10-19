@@ -15,6 +15,56 @@
 		android:divider="@drawable/list_divider" android:dividerHeight="1px" android:id="@android:id/list" 
 		android:layout_height="fill_parent" android:layout_width="fill_parent" android:clickable="true"> 
 		</ListView> -->
+	<EditText
+		android:id="@+id/searchText"
+		android:textSize="15px"
+		android:hint="Search for shops or items"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent">
+	</EditText>
+
+	<RadioGroup
+		android:id="@+id/searchTypeRadio"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<RadioButton
+			android:text="Shops"
+			android:layout_width="wrap_content"
+			android:id="@+id/shopsRadio"
+			android:layout_height="wrap_content"
+			android:checked="true">
+		</RadioButton>
+
+		<RadioButton
+			android:text="Items"
+			android:layout_width="wrap_content"
+			android:id="@+id/itemsRadio"
+			android:layout_height="wrap_content">
+		</RadioButton>
+	</RadioGroup>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center">
+		<Button
+			android:text="General Search"
+			android:id="@+id/genSearchBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+		</Button>
+
+		<Button
+			android:text="Search in current location"
+			android:id="@+id/locSearchBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+		</Button>
+	</LinearLayout>
+
 	<TextView
 		android:text="Departmental Stores"
 		android:id="@+id/departmentalstores"
@@ -49,11 +99,12 @@
 		android:layout_width="match_parent"
 		android:gravity="center">
 		<Button
+			android:layout_height="wrap_content"
 			android:text="Logout"
-			android:id="@+id/logoutBtn"
 			android:layout_width="100dp"
-			android:layout_height="wrap_content">
-		</Button>
+			android:id="@+id/logoutBtn"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"></Button>
 
 	</RelativeLayout>
 

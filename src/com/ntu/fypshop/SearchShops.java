@@ -1,5 +1,8 @@
 package com.ntu.fypshop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +12,7 @@ import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
+import com.google.android.maps.GeoPoint;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,6 +22,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 //import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 //import android.preference.PreferenceManager;
@@ -25,6 +32,7 @@ import android.util.Log;
 import android.view.View;
 //import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class SearchShops extends Activity {
@@ -34,18 +42,24 @@ public class SearchShops extends Activity {
 
 	private static GlobalVariable globalVar;
 	private TextView name, departmentalStores, clothes, others;
-	private Button logout;
+	private Button logout, genSearch, locSearch;
+	private RadioGroup searchType;
 	// private UserParticulars userS;
 	private String fnameS;
 	private String lnameS;
 	private String nameS;
-	//private String emailS;
+	// private String emailS;
 	private Boolean fbBtn;
 	private Facebook facebook;
-	
+	private LocationManager locationManager;
+	private GPSLocationListener locationListener;
+	private GeoPoint point = new GeoPoint(1304256, 103832538);;
+	private List<GeoPoint> pointList;
+
 	Handler mHandler = new Handler();
 
 	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1;
+	private static final String ITEMS = "Items", SHOPS = "store_locations";
 
 	// private String genderS;
 	// private String bdayS;
@@ -75,11 +89,20 @@ public class SearchShops extends Activity {
 		clothes = (TextView) findViewById(R.id.clothes);
 		others = (TextView) findViewById(R.id.others);
 		logout = (Button) findViewById(R.id.logoutBtn);
+		genSearch = (Button) findViewById(R.id.genSearchBtn);
+		locSearch = (Button) findViewById(R.id.locSearchBtn);
+		searchType = (RadioGroup) findViewById(R.id.searchTypeRadio);
 
 		globalVar = ((GlobalVariable) getApplicationContext());
 		fbBtn = globalVar.getfbBtn();
 		facebook = globalVar.getFBState();
-		
+
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		locationListener = new GPSLocationListener();
+
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
 		Log.d("FbButton: ", fbBtn.toString());
 		if (!fbBtn && !facebook.isSessionValid())
 		{
@@ -131,13 +154,63 @@ public class SearchShops extends Activity {
 		// finish();
 		// }
 		// }, intentFilter);
+	}
 
+	private void searchStores()
+	{
+		// TODO Auto-generated method stub
+		// if (globalVar.getSearchType() == 1)
+		// {
+		ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, getSearchType(), 1000);
+
+		pointList = new ArrayList<GeoPoint>();
+		// Log.d("Store Location Results in activity: ",
+		// connect.storeLocResult());
+		for (Shop sp : connect.getShop())
+		{
+			// Log.d("Shop address: ", sp.address);
+			// Log.d("Shop name: ", sp.name);
+			// Log.d("Shop lat: ", sp.lat);
+			// Log.d("Shop lng: ", sp.lng);
+			// Log.d("Shop distance: ", sp.distance);
+
+			GeoPoint p = new GeoPoint((int) (Double.parseDouble(sp.lat) * 1E6), (int) (Double.parseDouble(sp.lng) * 1E6));
+			pointList.add(p);
+			// Log.d("VO lat after geopoint: ",Integer.toString(((int)
+			// (Double.parseDouble(vo.lat) * 1E6))));
+			// OverlayItem item = new OverlayItem(p,"Testing Title",
+			// "Testing Description");
+			// item.setMarker(drawable);
+			// usersMarker.addOverlay(item);
+			// MapOverlay mapOverlay2 = new MapOverlay(STORES_LOC);
+			// mapOverlay2.setPointToDraw(p);
+			// listOfOverlays.add(mapOverlay2);
+			// OverlayItem item = new OverlayItem(p, sp.name, sp.address);
+			// item.setMarker(getResources().getDrawable(R.drawable.pushpin));
+
+			// }
+		}
+		Log.d("PointList: ", Integer.toString(pointList.get(0).getLatitudeE6()));
 	}
 
 	private void init(final int type)
 	{
 		globalVar = ((GlobalVariable) getApplicationContext());
 		// TODO Auto-generated method stub
+		genSearch.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				// globalVar.setSearchType(getSearchType());
+			}
+		});
+		locSearch.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				searchStores();
+			}
+		});
 		departmentalStores.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v)
@@ -172,6 +245,19 @@ public class SearchShops extends Activity {
 				doLogout(type);
 			}
 		});
+	}
+
+	protected String getSearchType()
+	{
+		// TODO Auto-generated method stub
+		if (searchType.getCheckedRadioButtonId() == R.id.itemsRadio)
+		{
+			return ITEMS;
+		}
+		else
+		{
+			return SHOPS;
+		}
 	}
 
 	@Override
@@ -244,7 +330,6 @@ public class SearchShops extends Activity {
 		GlobalVariable FbState = ((GlobalVariable) getApplicationContext());
 
 		// private SessionListener mSessionListener = new SessionListener();
-		
 
 		public FbConnect(String appId, Activity activity, Context context)
 		{
@@ -254,27 +339,28 @@ public class SearchShops extends Activity {
 			this.activity = activity;
 			globalVar = ((GlobalVariable) getApplicationContext());
 
-//			SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this); 
-//            String access_token = prefs.getString("access_token", null); 
-//            Long expires = prefs.getLong("access_expires", -1);
-//            String sharedName = prefs.getString("name", "");
-//
-//
-//            if (access_token != null && expires != -1)
-//            {
-//                facebook.setAccessToken(access_token);
-//                facebook.setAccessExpires(expires);
-//            }
+			// SharedPreferences prefs=
+			// PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
+			// String access_token = prefs.getString("access_token", null);
+			// Long expires = prefs.getLong("access_expires", -1);
+			// String sharedName = prefs.getString("name", "");
+			//
+			//
+			// if (access_token != null && expires != -1)
+			// {
+			// facebook.setAccessToken(access_token);
+			// facebook.setAccessExpires(expires);
+			// }
 
-
-//            if (!facebook.isSessionValid() || sharedName.equals(""))
-//            {
-//                facebook.authorize(activity, FACEBOOK_PERMISSION, new LoginDialogListener());
-//            }
-//            else
-//			{
-//				name.setText("Hello " + sharedName + ",");
-//			}
+			// if (!facebook.isSessionValid() || sharedName.equals(""))
+			// {
+			// facebook.authorize(activity, FACEBOOK_PERMISSION, new
+			// LoginDialogListener());
+			// }
+			// else
+			// {
+			// name.setText("Hello " + sharedName + ",");
+			// }
 			facebook = FbState.getFBState();
 			// if (!facebook.isSessionValid())
 			// {
@@ -306,7 +392,7 @@ public class SearchShops extends Activity {
 			// }
 			else
 			{
-//				globalVar = ((GlobalVariable) getApplicationContext());
+				// globalVar = ((GlobalVariable) getApplicationContext());
 				name.setText("Hello " + globalVar.getName() + ",");
 			}
 		}
@@ -349,14 +435,13 @@ public class SearchShops extends Activity {
 					fnameS = json.getString("first_name");
 					lnameS = json.getString("last_name");
 					nameS = fnameS + " " + lnameS;
-					//emailS = json.getString("email");
+					// emailS = json.getString("email");
 					// genderS = json.getString("gender");
 					// bdayS = json.getString("birthday");
 					Log.d("Facebook", fnameS);
 					// userS = new UserParticulars(fnameS, lnameS, emailS,
 					// genderS, bdayS);
-					
-					
+
 					// callback should be run in the original thread,
 					// not the background thread
 					mHandler.post(new Runnable()
@@ -364,19 +449,23 @@ public class SearchShops extends Activity {
 						public void run()
 						{
 							name.setText("Hello " + nameS + ",");
-//							globalVar = ((GlobalVariable) getApplicationContext());
-//							globalVar.setName(nameS);
-							
-//							String token = facebook.getAccessToken();
-//							long token_expires = facebook.getAccessExpires();
+							// globalVar = ((GlobalVariable)
+							// getApplicationContext());
+							// globalVar.setName(nameS);
 
-//							SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
-//
-//							prefs.edit().putLong("access_expires", token_expires).commit();
-//
-//							prefs.edit().putString("access_token", token).commit();
-//							
-//							prefs.edit().putString("name", nameS).commit();
+							// String token = facebook.getAccessToken();
+							// long token_expires = facebook.getAccessExpires();
+
+							// SharedPreferences prefs=
+							// PreferenceManager.getDefaultSharedPreferences(SearchShops.this);
+							//
+							// prefs.edit().putLong("access_expires",
+							// token_expires).commit();
+							//
+							// prefs.edit().putString("access_token",
+							// token).commit();
+							//
+							// prefs.edit().putString("name", nameS).commit();
 							// fname.setText(fnameS);
 							// lname.setText(lnameS);
 							// email.setText(emailS);
@@ -462,6 +551,57 @@ public class SearchShops extends Activity {
 					SessionEvents.onLogoutFinish();
 				}
 			});
+		}
+	}
+
+	private class GPSLocationListener implements LocationListener {
+
+		@Override
+		public void onLocationChanged(Location location)
+		{
+			if (location != null)
+			{
+
+				point = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
+
+				// add marker
+				// MapOverlay mapOverlay = new MapOverlay(MY_POINT);
+				// mapOverlay.setPointToDraw(point);
+				// listOfOverlays = mapView.getOverlays();
+				// listOfOverlays.clear();
+				// listOfOverlays.add(mapOverlay);
+
+				// String address = ConvertPointToLocation(point);
+				// Log.d("Address: ", address);
+
+				// Drawable drawable =
+				// getResources().getDrawable(R.drawable.red);
+
+				// searchStores(point);
+
+				// mapView.invalidate();
+			}
+		}
+
+		@Override
+		public void onProviderDisabled(String provider)
+		{
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onProviderEnabled(String provider)
+		{
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras)
+		{
+			// TODO Auto-generated method stub
+
 		}
 	}
 }

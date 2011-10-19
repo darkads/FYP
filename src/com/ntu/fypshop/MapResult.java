@@ -8,13 +8,12 @@ import java.util.Locale;
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
 import com.google.android.maps.GeoPoint;
-import com.google.android.maps.ItemizedOverlay;
+//import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
-import com.ntu.fypshop.ConnectDB.MyVO;
 
 import android.content.Context;
 import android.content.Intent;
@@ -57,8 +56,6 @@ public class MapResult extends MapActivity {
 
 	private Boolean fbBtn;
 
-	// List<MyVO> myVO;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -86,15 +83,6 @@ public class MapResult extends MapActivity {
 			initLogout(INIT_FB);
 		}
 
-		// enable Street view by default
-		// Problem: Enabling this part triggers cross marks in the map
-		// mapView.setStreetView(true);
-
-		// enable to show Satellite view
-		// mapView.setSatellite(true);
-
-		// enable to show Traffic on map
-		// mapView.setTraffic(true);
 		mapView.setBuiltInZoomControls(true);
 		mapController = mapView.getController();
 		mapController.setZoom(16);
@@ -110,23 +98,6 @@ public class MapResult extends MapActivity {
 			{
 
 				// TODO Auto-generated method stub
-				// Logout logic here...
-				// globalVar = ((GlobalVariable) getApplicationContext());
-				// globalVar.setName("");
-				// globalVar.setfbBtn(false);
-				// globalVar.setHashPw("");
-				// globalVar.setEm("");
-				//
-				// SharedPreferences login =
-				// getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
-				// SharedPreferences.Editor editor = login.edit();
-				// editor.putString("emailLogin", "");
-				// editor.putString("pwLogin", "");
-				// editor.commit();
-				//
-				// Intent intent = new Intent(v.getContext(), LoginPage.class);
-				// intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				// startActivity(intent);
 				doLogout(type);
 			}
 		});
@@ -180,27 +151,23 @@ public class MapResult extends MapActivity {
 			ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, 1000);
 
 			Log.d("Store Location Results in activity: ", connect.storeLocResult());
-			// Markers usersMarker = new
-			// Markers(drawable,MapResult.this);
-			for (MyVO vo : connect.getMyVO())
+			for (Shop sp : connect.getShop())
 			{
-				Log.d("VO address: ", vo.address);
-				Log.d("VO name: ", vo.name);
-				Log.d("VO lat: ", vo.lat);
-				Log.d("VO lng: ", vo.lng);
-				Log.d("VO distance: ", vo.distance);
+				Log.d("Shop address: ", sp.address);
+				Log.d("Shop name: ", sp.name);
+				Log.d("Shop lat: ", sp.lat);
+				Log.d("Shop lng: ", sp.lng);
+				Log.d("Shop distance: ", sp.distance);
 
-				GeoPoint p = new GeoPoint((int) (Double.parseDouble(vo.lat) * 1E6), (int) (Double.parseDouble(vo.lng) * 1E6));
-				// Log.d("VO lat after geopoint: ",Integer.toString(((int)
-				// (Double.parseDouble(vo.lat) * 1E6))));
-				// OverlayItem item = new OverlayItem(p,"Testing Title",
-				// "Testing Description");
+				GeoPoint p = new GeoPoint((int) (Double.parseDouble(sp.lat) * 1E6), (int) (Double.parseDouble(sp.lng) * 1E6));
+				// Log.d("VO lat after geopoint: ",Integer.toString(((int) (Double.parseDouble(vo.lat) * 1E6))));
+				// OverlayItem item = new OverlayItem(p,"Testing Title", "Testing Description");
 				// item.setMarker(drawable);
 				// usersMarker.addOverlay(item);
 				// MapOverlay mapOverlay2 = new MapOverlay(STORES_LOC);
 				// mapOverlay2.setPointToDraw(p);
 				// listOfOverlays.add(mapOverlay2);
-				OverlayItem item = new OverlayItem(p, "Hello", "Store");
+				OverlayItem item = new OverlayItem(p, sp.name, sp.address);
 				// item.setMarker(getResources().getDrawable(R.drawable.pushpin));
 				itemmarker.addOverlay(item);
 
@@ -227,10 +194,7 @@ public class MapResult extends MapActivity {
 			}
 			// else
 			// {
-			// Log.d("address = 0: ", Double.toString(point.getLatitudeE6()
-			// / 1E6));
-			// address = "Latitude: " + (point.getLatitudeE6() / 1E6) +
-			// "\n Longtitude: " + (point.getLongitudeE6() / 1E6);
+			// address = "Latitude: " + (point.getLatitudeE6() / 1E6) + "\n Longtitude: " + (point.getLongitudeE6() / 1E6);
 			// }
 		}
 		catch (IOException e)
@@ -238,8 +202,6 @@ public class MapResult extends MapActivity {
 			e.printStackTrace();
 			Log.d("address = 0: ", Double.toString(point.getLatitudeE6() / 1E6));
 			address = "Latitude: " + (point.getLatitudeE6() / 1E6) + "\nLongtitude: " + (point.getLongitudeE6() / 1E6);
-			// address = "Latitude: " + point.getLatitudeE6() +
-			// "/nLongtitude: " + point.getLongitudeE6();
 		}
 
 		return address;
@@ -258,11 +220,6 @@ public class MapResult extends MapActivity {
 			{
 
 				GeoPoint point = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
-				/*
-				 * Toast.makeText(getBaseContext(), "Latitude: " +
-				 * location.getLatitude() + " Longitude: " +
-				 * location.getLongitude(), Toast.LENGTH_SHORT).show();
-				 */
 
 				mapController.animateTo(point);
 				mapController.setZoom(16);
@@ -281,11 +238,8 @@ public class MapResult extends MapActivity {
 
 				String address = ConvertPointToLocation(point);
 				Log.d("Address: ", address);
-				// Toast.makeText(MapResult.this, address,
-				// Toast.LENGTH_LONG).show();
 
-				// Drawable drawable =
-				// getResources().getDrawable(R.drawable.red);
+				// Drawable drawable = getResources().getDrawable(R.drawable.red);
 				searchStores(point);
 
 				mapView.invalidate();

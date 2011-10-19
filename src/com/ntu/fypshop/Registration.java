@@ -3,7 +3,6 @@ package com.ntu.fypshop;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
-import com.facebook.android.AsyncFacebookRunner;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -19,14 +18,10 @@ public class Registration extends Activity {
 	// private int mMonth;
 	// private int mDay;
 
-	private static GlobalVariable applicationcontext;
-	private UserParticulars userS;
-	// private String fnameS;
-	// private String lnameS;
+	//private static GlobalVariable applicationcontext;
+	//private UserParticulars userS;
 	// private String nameS;
 	// private String emailS;
-	// private String genderS;
-	// private String bdayS;
 
 	// static final int DATE_DIALOG_ID = 0;
 	// private TextView bday;
@@ -35,14 +30,9 @@ public class Registration extends Activity {
 
 	private Button regBtn;
 	private EditText name;
-	// private EditText lname;
 	private EditText email;
 	private EditText password;
-	// private RadioButton male;
-	// private RadioButton female;
 
-	private AsyncFacebookRunner mAsyncRunner;
-	// Integer[] bdayInt = new Integer[3];
 
 	UserParticulars user;
 
@@ -60,9 +50,6 @@ public class Registration extends Activity {
 		// facebook = new Facebook(APP_ID);
 		// mAsyncRunner = new AsyncFacebookRunner(facebook);
 		// fbConnect.init(this, facebook, FACEBOOK_PERMISSION);
-		// btn = (Button) findViewById(R.id.bdateBtn);
-		// fname = (EditText) findViewById(R.id.fnameTxtBox);
-		// lname = (EditText) findViewById(R.id.lnameTxtBox);
 
 		name = (EditText) findViewById(R.id.nameTxtBox);
 		email = (EditText) findViewById(R.id.emailTxtBox);
@@ -70,9 +57,6 @@ public class Registration extends Activity {
 		regBtn = (Button) findViewById(R.id.regBtn);
 
 		reginit();
-		// bday = (TextView) findViewById(R.id.bdateTxt1);
-		// male = (RadioButton) findViewById(R.id.male);
-		// female = (RadioButton) findViewById(R.id.female);
 		// Calendar cal = Calendar.getInstance();
 		// mYear = cal.get(Calendar.YEAR);
 		// mMonth = cal.get(Calendar.MONTH);
@@ -113,28 +97,6 @@ public class Registration extends Activity {
 	protected void onResume()
 	{
 		super.onResume();
-		// updateLoginStatus();
-		// Bundle data = getIntent().getExtras();
-		// if (data != null)
-		// {
-		// user = data.getParcelable("data");
-		// fname.setText(user.getfName());
-		// lname.setText(user.getlName());
-		// email.setText(user.getEmail());
-		// if (user.getGender().equals("male"))
-		// {
-		// male.setChecked(true);
-		// female.setChecked(false);
-		// }
-		// else if (user.getGender().equals("female"))
-		// {
-		// female.setChecked(true);
-		// male.setChecked(false);
-		// }
-		// bday.setText("Your Birthdate is: " + user.getBday()[0] + "/" +
-		// user.getBday()[1] + "/" + user.getBday()[2]);
-		// }
-
 	}
 
 	public void reginit()

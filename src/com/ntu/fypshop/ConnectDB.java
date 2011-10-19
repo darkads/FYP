@@ -23,8 +23,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.commons.codec.binary.Base64;
 //import org.json.JSONArray;
 //import org.json.JSONException;
@@ -34,6 +38,7 @@ import org.json.JSONObject;
 
 //import com.facebook.android.Util;
 
+//import android.os.Looper;
 import android.util.Log;
 
 public class ConnectDB {
@@ -47,7 +52,7 @@ public class ConnectDB {
 	String hpw = "";
 	HttpClient client;
 
-	List<MyVO> vos;
+	List<Shop> shop;
 
 	public ConnectDB(String email, String password, Integer type)
 	{
@@ -260,30 +265,31 @@ public class ConnectDB {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
 			StringBuilder sb = new StringBuilder();
 			String line = reader.readLine();
-			while(line != null)
+			while (line != null)
 			{
 				sb.append(line).append("\n");
 				line = reader.readLine();
 			}
 			String result1 = sb.toString();
 			Log.d("testing line: ", result1);
-			JSONObject jsonObj = null;//new JSONObject(line);
-			vos = new ArrayList<MyVO>();
+			JSONObject jsonObj = null;// new JSONObject(line);
+			shop = new ArrayList<Shop>();
 			JSONArray jArray = new JSONArray(result1);
 			for (int i = 0; i < jArray.length(); i++)
 			{
 				jsonObj = jArray.getJSONObject(i);
-				vos.add(new MyVO(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng"), jsonObj.getString("distance")));
+				shop.add(new Shop(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng"), jsonObj.getString("distance")));
 			}
-//			JSONArray values = jsonObj.getJSONArray("row");
-//			for (int i = 0; i < values.length(); i++)
-//			{
-//				Log.d("address: ", values.getJSONObject(i).getString("address"));
-//				Log.d("name: ", values.getJSONObject(i).getString("name"));
-//				Log.d("lat: ", values.getJSONObject(i).getString("lat"));
-//				Log.d("lng: ", values.getJSONObject(i).getString("lng"));
-//				Log.d("distance: ", values.getJSONObject(i).getString("distance"));
-//			}
+			// JSONArray values = jsonObj.getJSONArray("row");
+			// for (int i = 0; i < values.length(); i++)
+			// {
+			// Log.d("address: ", values.getJSONObject(i).getString("address"));
+			// Log.d("name: ", values.getJSONObject(i).getString("name"));
+			// Log.d("lat: ", values.getJSONObject(i).getString("lat"));
+			// Log.d("lng: ", values.getJSONObject(i).getString("lng"));
+			// Log.d("distance: ",
+			// values.getJSONObject(i).getString("distance"));
+			// }
 			// while ((line = reader.readLine()) != null)
 			// {
 			// sb.append(line + "\n");
@@ -306,6 +312,117 @@ public class ConnectDB {
 		{
 			Log.e("log_tag", "Error converting result " + exc.toString());
 		}
+	}
+
+	public ConnectDB(final Double lat, final Double lng, final String searchType, final Integer radius)
+	{
+//		Thread t = new Thread()
+//		{
+//			public void run()
+//			{
+//				Looper.prepare(); // For Preparing Message Pool for the child Thread
+
+				// the data to send
+				JSONObject json = new JSONObject();
+				// ArrayList<NameValuePair> nameValuePairs = new
+				// ArrayList<NameValuePair>();
+				//
+				// nameValuePairs.add(new BasicNameValuePair("lat",
+				// Double.toString(lat)));
+				// nameValuePairs.add(new BasicNameValuePair("lng",
+				// Double.toString(lng)));
+				// nameValuePairs.add(new BasicNameValuePair("type",
+				// Integer.toString(searchType)));
+				// nameValuePairs.add(new BasicNameValuePair("radius",
+				// Integer.toString(radius)));
+				// http post
+				try
+				{
+					HttpClient httpclient = new DefaultHttpClient();
+					HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), 10000); //Timeout Limit
+					HttpPost httppost = new HttpPost("http://10.0.2.2/storeLocations.php");
+					json.put("lat", Double.toString(lat));
+					json.put("lng", Double.toString(lng));
+					json.put("type", searchType);
+					json.put("radius", Integer.toString(radius));
+					httppost.setHeader("json", json.toString());
+					StringEntity se = new StringEntity(json.toString());
+					se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+					httppost.setEntity(se);
+//					Log.d("se: ", new BufferedReader(new InputStreamReader(se.getContent())).readLine());
+					HttpResponse response = httpclient.execute(httppost);
+					if (response != null)
+					{
+						HttpEntity entity = response.getEntity();
+						is = entity.getContent();
+					}
+				}
+
+				catch (Exception ex)
+				{
+					Log.e("log_tag", "Error in http connection " + ex.toString());
+				}
+				// convert response to string
+				try
+				{
+					BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+					StringBuilder sb = new StringBuilder();
+					String line = reader.readLine();
+					while (line != null)
+					{
+						sb.append(line).append("\n");
+						line = reader.readLine();
+					}
+					String result1 = sb.toString();
+					Log.d("testing line: ", result1);
+					JSONObject jsonObj = null;// new JSONObject(line);
+					shop = new ArrayList<Shop>();
+					JSONArray jArray = new JSONArray(result1);
+					for (int i = 0; i < jArray.length(); i++)
+					{
+						jsonObj = jArray.getJSONObject(i);
+						shop.add(new Shop(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng"), jsonObj.getString("distance")));
+						Log.d("Name"+ Integer.toString(i)+": ", jsonObj.getString("name"));
+					}
+					// JSONArray values = jsonObj.getJSONArray("row");
+					// for (int i = 0; i < values.length(); i++)
+					// {
+					// Log.d("address: ",
+					// values.getJSONObject(i).getString("address"));
+					// Log.d("name: ",
+					// values.getJSONObject(i).getString("name"));
+					// Log.d("lat: ", values.getJSONObject(i).getString("lat"));
+					// Log.d("lng: ", values.getJSONObject(i).getString("lng"));
+					// Log.d("distance: ",
+					// values.getJSONObject(i).getString("distance"));
+					// }
+					// while ((line = reader.readLine()) != null)
+					// {
+					// sb.append(line + "\n");
+					// }
+					is.close();
+
+					result = jsonObj.getString("address");// sb.toString();
+					Log.d("Result in ConnectDB for locations: ", result);
+					// if (result.equals("1"))
+					// {
+					// storeLocResult(1);
+					// }
+					// else
+					// {
+					// storeLocResult(0);
+					// }
+				}
+
+				catch (Exception exc)
+				{
+					Log.e("log_tag", "Error converting result " + exc.toString());
+				}
+				//Loop in the message queue
+//				Looper.loop();
+//			}
+//		};
+//		t.start();
 	}
 
 	public String getName()
@@ -357,27 +474,9 @@ public class ConnectDB {
 		}
 		return Base64.encodeBase64(input);
 	}
-	
-	public List<MyVO> getMyVO()
+
+	public List<Shop> getShop()
 	{
-		return vos;
+		return shop;
 	}
-
-	public class MyVO {
-		final public String address;
-		final public String name;
-		final public String lat;
-		final public String lng;
-		final public String distance;
-
-		public MyVO(String add, String nm, String lt, String lg, String dt)
-		{
-			address = add;
-			name = nm;
-			lat = lt;
-			lng = lg;
-			distance = dt;
-		}
-	}
-
 }
