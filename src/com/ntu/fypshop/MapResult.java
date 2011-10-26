@@ -148,7 +148,7 @@ public class MapResult extends MapActivity {
 		// TODO Auto-generated method stub
 		if (globalVar.getSearchType() == 1)
 		{
-			ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, 1000);
+			ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, "store_locations", 1000);
 
 			Log.d("Store Location Results in activity: ", connect.storeLocResult());
 			for (Shop sp : connect.getShop())
@@ -360,7 +360,7 @@ public class MapResult extends MapActivity {
 		public Markers(Drawable defaultMarker, MapView mv)
 		{
 
-			super(boundCenter(defaultMarker), mv);
+			super(boundCenter(defaultMarker), mv, globalVar);
 			// TODO Auto-generated constructor stub
 		}
 
@@ -400,6 +400,13 @@ public class MapResult extends MapActivity {
 			populate();
 		}
 
+		@Override
+		public boolean onBalloonTap(int index, OverlayItem item)
+		{
+			Intent myintent = new Intent(MapResult.this, ShopPage.class);
+            startActivity(myintent);
+			return (super.onBalloonTap(index, item));
+		}
 	}
 
 }

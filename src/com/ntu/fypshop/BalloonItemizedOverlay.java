@@ -23,6 +23,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 	final MapController mc;
 	private Item currentFocussedItem;
 	private int currentFocussedIndex;
+	private GlobalVariable globalVar;
 
 	/**
 	 * Create a new BalloonItemizedOverlay
@@ -33,9 +34,10 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 	 * @param mapView
 	 *            - The view upon which the overlay items are to be drawn.
 	 */
-	public BalloonItemizedOverlay(Drawable defaultMarker, MapView mapView)
+	public BalloonItemizedOverlay(Drawable defaultMarker, MapView mapView, GlobalVariable globalV)
 	{
 		super(defaultMarker);
+		globalVar = globalV;
 		this.mapView = mapView;
 		viewOffset = 0;
 		mc = mapView.getController();
@@ -73,7 +75,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 	 */
 	protected boolean onBalloonTap(int index, Item item)
 	{
-		return false;
+		return true;
 	}
 
 	/*
@@ -176,6 +178,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 					}
 					// call overridden method
 					onBalloonTap(currentFocussedIndex, currentFocussedItem);
+					globalVar.setGeoPoint(currentFocussedItem.getPoint());
 					return true;
 				}
 				else

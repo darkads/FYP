@@ -13,20 +13,24 @@ import com.facebook.android.FacebookError;
 import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
 import com.google.android.maps.GeoPoint;
+import com.ntu.fypshop.TwitterApp.TwDialogListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 //import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 //import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+//import android.os.Message;
 //import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -38,27 +42,32 @@ import android.widget.TextView;
 public class SearchShops extends Activity {
 
 	private static final String APP_ID = "222592464462347";
+	private static final String twitter_consumer_key = "L0UuqLWRkQ0r9LkZvMl0Zw";
+	private static final String twitter_secret_key = "CelQ7Bvl0mLGGKw6iiV3cDcuP0Lh1XAI6x0fCF0Pd4";
 	FbConnect fbConnect;
 
 	private static GlobalVariable globalVar;
 	private TextView name, departmentalStores, clothes, others;
-	private Button logout, genSearch, locSearch;
+	private Button logout, genSearch, locSearch, productPage;
 	private RadioGroup searchType;
 	// private UserParticulars userS;
 	private String fnameS;
 	private String lnameS;
 	private String nameS;
 	// private String emailS;
-	private Boolean fbBtn;
+	private Boolean fbBtn, twitBtn;
 	private Facebook facebook;
+
+	private TwitterApp mTwitter;
 	private LocationManager locationManager;
 	private GPSLocationListener locationListener;
 	private GeoPoint point = new GeoPoint(1304256, 103832538);;
 	private List<GeoPoint> pointList;
 
 	Handler mHandler = new Handler();
+	private ProgressDialog mProgress;
 
-	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1;
+	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1, INIT_TWIT = 2;
 	private static final String ITEMS = "Items", SHOPS = "store_locations";
 
 	// private String genderS;
@@ -92,10 +101,18 @@ public class SearchShops extends Activity {
 		genSearch = (Button) findViewById(R.id.genSearchBtn);
 		locSearch = (Button) findViewById(R.id.locSearchBtn);
 		searchType = (RadioGroup) findViewById(R.id.searchTypeRadio);
+		productPage = (Button) findViewById(R.id.productPageBtn);
 
 		globalVar = ((GlobalVariable) getApplicationContext());
 		fbBtn = globalVar.getfbBtn();
+		twitBtn = globalVar.getTwitBtn();
+		
 		facebook = globalVar.getFBState();
+		mTwitter = new TwitterApp(this, twitter_consumer_key, twitter_secret_key);
+		mTwitter.setListener(mTwLoginDialogListener);
+		globalVar.setTwitState(mTwitter);
+		
+		mProgress = new ProgressDialog(this);
 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -104,7 +121,28 @@ public class SearchShops extends Activity {
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 		Log.d("FbButton: ", fbBtn.toString());
-		if (!fbBtn && !facebook.isSessionValid())
+		SharedPreferences sharedPref = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+		
+		if (fbBtn || facebook.isSessionValid())
+		{
+			fbConnect = new FbConnect(APP_ID, this, getApplicationContext());
+			init(INIT_FB);
+		}
+		
+		else if (twitBtn || mTwitter.hasAccessToken())
+		{
+			init(INIT_TWIT);
+			if(mTwitter.hasAccessToken())
+			{
+				name.setText("Hello " + sharedPref.getString("user_name", "") + ",");
+			}
+			else
+			{
+				globalVar.setTwitBtn(false);
+				mTwitter.authorize();
+			}
+		}
+		else
 		{
 			SharedPreferences userDetails = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 			String Uname = userDetails.getString("emailLogin", "");
@@ -131,11 +169,6 @@ public class SearchShops extends Activity {
 					showDialog(DIALOG_ERR_LOGIN);
 				}
 			}
-		}
-		else
-		{
-			fbConnect = new FbConnect(APP_ID, this, getApplicationContext());
-			init(INIT_FB);
 		}
 
 		// IntentFilter intentFilter = new IntentFilter();
@@ -238,6 +271,14 @@ public class SearchShops extends Activity {
 				startActivity(intent);
 			}
 		});
+		productPage.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(v.getContext(), ProductPage.class);
+				startActivity(intent);
+			}
+		});
 		logout.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v)
@@ -277,7 +318,6 @@ public class SearchShops extends Activity {
 			// Logout logic here...
 			globalVar = ((GlobalVariable) getApplicationContext());
 			globalVar.setName("");
-			globalVar.setfbBtn(false);
 			globalVar.setHashPw("");
 			globalVar.setEm("");
 
@@ -287,14 +327,24 @@ public class SearchShops extends Activity {
 			editor.putString("pwLogin", "");
 			editor.commit();
 		}
-		else
+		else if (type == INIT_FB)
 		{
-			// Go to login
+			// Go to LoginPage
+			SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+			SharedPreferences.Editor editor = login.edit();
+			editor.putString("facebookName", "");
+			editor.commit();
 			globalVar = ((GlobalVariable) getApplicationContext());
 			Facebook mFacebook = globalVar.getFBState();
+			globalVar.setfbBtn(false);
 			SessionEvents.onLogoutBegin();
 			AsyncFacebookRunner asyncRunner = new AsyncFacebookRunner(mFacebook);
 			asyncRunner.logout(getApplicationContext(), new LogoutRequestListener());
+		}
+		else
+		{
+			mTwitter.resetAccessToken();
+			globalVar.setTwitBtn(false);
 		}
 
 		// Return to the login activity
@@ -302,6 +352,44 @@ public class SearchShops extends Activity {
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
+	
+	private final TwDialogListener mTwLoginDialogListener = new TwDialogListener()
+	{
+		@Override
+		public void onComplete(String value)
+		{
+			String username = mTwitter.getUsername();
+			username = (username.equals("")) ? "No Name" : username;
+
+//			SharedPreferences sharedPref = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+			name.setText("Hello " + username + ",");
+//			name.setText("Hello " + sharedPref.getString("user_name", "") + ",");
+			// mTwitterBtn.setText("  Twitter  (" + username + ")");
+			// mTwitterBtn.setChecked(true);
+			// mTwitterBtn.setTextColor(Color.WHITE);
+
+			// Toast.makeText(TestConnect.this, "Connected to Twitter as " +
+			// username, Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onError(String value)
+		{
+			// mTwitterBtn.setChecked(false);
+			//
+			// Toast.makeText(TestConnect.this, "Twitter connection failed",
+			// Toast.LENGTH_LONG).show();
+		}
+		
+		@Override
+		public void onCancel()
+		{
+			// Return to the login activity
+			Intent intent = new Intent(SearchShops.this, LoginPage.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+		}
+	};
 
 	// @Override
 	// public boolean onOptionsItemSelected(MenuItem item) {
@@ -321,13 +409,16 @@ public class SearchShops extends Activity {
 	public class FbConnect {
 
 		private final String[] FACEBOOK_PERMISSION =
-		{ "user_birthday", "email" };
+		{ "user_birthday", "email", "publish_stream", "read_stream", "offline_access" };
 
 		private Context context;
 		private Activity activity;
-		private Handler mHandler;
+//		private Handler mHandler;
 		private Facebook facebook;
 		GlobalVariable FbState = ((GlobalVariable) getApplicationContext());
+		
+		private SharedPreferences sharedPref;
+		private Editor editor;
 
 		// private SessionListener mSessionListener = new SessionListener();
 
@@ -335,8 +426,12 @@ public class SearchShops extends Activity {
 		{
 
 			this.context = context;
-			this.mHandler = new Handler();
+//			this.mHandler = new Handler();
 			this.activity = activity;
+			
+			sharedPref = context.getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
+
+			editor = sharedPref.edit();
 			globalVar = ((GlobalVariable) getApplicationContext());
 
 			// SharedPreferences prefs=
@@ -393,7 +488,8 @@ public class SearchShops extends Activity {
 			else
 			{
 				// globalVar = ((GlobalVariable) getApplicationContext());
-				name.setText("Hello " + globalVar.getName() + ",");
+				name.setText("Hello " + sharedPref.getString("facebookName", "") + ",");
+				mProgress.dismiss();
 			}
 		}
 
@@ -401,8 +497,11 @@ public class SearchShops extends Activity {
 			public void onComplete(Bundle values)
 			{
 				SessionEvents.onLoginSuccess();
+
+				mProgress.setMessage("Finalizing ...");
+		        mProgress.show();
 				AsyncFacebookRunner syncRunner = new AsyncFacebookRunner(facebook);
-				syncRunner.request("me", new LoginRequestListener());
+				syncRunner.request("me", new LoginRequestListener());				
 			}
 
 			public void onFacebookError(FacebookError error)
@@ -422,8 +521,8 @@ public class SearchShops extends Activity {
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 			}
-		}
-
+		}		
+		
 		public class LoginRequestListener extends BaseRequestListener {
 			public void onComplete(String response, final Object state)
 			{
@@ -448,7 +547,10 @@ public class SearchShops extends Activity {
 					{
 						public void run()
 						{
+							editor.putString("facebookName", nameS);
+							editor.commit();
 							name.setText("Hello " + nameS + ",");
+							mProgress.dismiss();
 							// globalVar = ((GlobalVariable)
 							// getApplicationContext());
 							// globalVar.setName(nameS);
@@ -536,8 +638,8 @@ public class SearchShops extends Activity {
 			}
 		});
 		return alertDialog;
-	}
-
+	}	
+	
 	public class LogoutRequestListener extends BaseRequestListener {
 		public void onComplete(String response, final Object state)
 		{

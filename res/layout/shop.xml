@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+	<TextView
+		android:id="@+id/shopTitle"
+		android:layout_alignLeft="@+id/shopMap"
+		android:layout_height="wrap_content"
+		android:text="ABC Shop"
+		android:textSize="20px"
+		android:layout_width="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="20dp">
+	</TextView>
+
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:id="@+id/relativeLayout1">
+		<com.google.android.maps.MapView
+			android:id="@+id/shopMap"
+			android:layout_height="150dp"
+			android:clickable="true"
+			android:layout_width="150dp"
+			android:layout_alignParentTop="true"
+			android:layout_alignParentLeft="true"
+			android:layout_marginLeft="10dp"
+			android:layout_marginTop="20dp"
+			android:apiKey="0fJKoBXvkjaxqXZ_loYfQEEXmINxngMMjOROQSQ">
+		</com.google.android.maps.MapView>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:id="@+id/addressTitle"
+			android:text="Address:"
+			android:layout_width="wrap_content"
+			android:layout_alignTop="@+id/shopMap"
+			android:layout_toRightOf="@+id/shopMap"
+			android:layout_marginLeft="21dp">
+		</TextView>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:id="@+id/shopAddress"
+			android:text="abc"
+			android:layout_width="wrap_content"
+			android:layout_below="@+id/addressTitle"
+			android:layout_alignLeft="@+id/addressTitle">
+		</TextView>
+
+
+	</RelativeLayout>
+
+</LinearLayout>

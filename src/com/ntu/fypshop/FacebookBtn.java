@@ -50,7 +50,7 @@ public class FacebookBtn extends ImageButton {
 		// mAsyncRunner = new AsyncFacebookRunner(mFacebook);
 		setBackgroundColor(Color.TRANSPARENT);
 		setAdjustViewBounds(true);
-		setImageResource(fb.isSessionValid() ? R.drawable.logout_button : R.drawable.login_button);
+		setImageResource(fb.isSessionValid() ? R.drawable.logout_button : R.drawable.fb_login_button);
 		drawableStateChanged();
 
 		context = con;
@@ -96,7 +96,7 @@ public class FacebookBtn extends ImageButton {
 		{
 			SessionStore.clear(context);
 
-			setImageResource(R.drawable.login_button);
+			setImageResource(R.drawable.fb_login_button);
 		}
 	}
 	// public FacebookConnector(String appId, Activity activity, Context

@@ -32,7 +32,7 @@
 		android:id="@+id/emailTxtBox"
 		android:layout_below="@+id/imageView1"
 		android:layout_toRightOf="@+id/emailTxt"
-		android:layout_marginTop="20dp"
+		android:layout_marginTop="10dp"
 		android:textSize="17px"
 		android:paddingBottom="5dp"
 		android:paddingLeft="5dp"
@@ -90,26 +90,6 @@
 	<!-- android:layout_centerHorizontal="true" android:layout_marginTop="74dp"> -->
 	<!-- </ImageButton> -->
 
-	<ImageButton
-		android:id="@+id/registerBtn"
-		android:background="@drawable/register_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@+id/fbLoginBtn"
-		android:layout_centerHorizontal="true"
-		android:layout_marginTop="17dp">
-	</ImageButton>
-
-	<com.ntu.fypshop.FacebookBtn
-		android:layout_width="wrap_content"
-		android:id="@+id/fbLoginBtn"
-		android:layout_height="wrap_content"
-		android:src="@drawable/login_button"
-		android:layout_below="@+id/loginBtn"
-		android:layout_centerHorizontal="true"
-		android:layout_marginTop="15dp">
-	</com.ntu.fypshop.FacebookBtn>
-
 	<Button
 		android:textSize="15px"
 		android:layout_width="150dp"
@@ -120,6 +100,37 @@
 		android:layout_toRightOf="@+id/passwordTxt"
 		android:layout_marginTop="15dp">
 	</Button>
+	
+	<com.ntu.fypshop.FacebookBtn
+		android:layout_width="wrap_content"
+		android:id="@+id/fbLoginBtn"
+		android:layout_height="wrap_content"
+		android:src="@drawable/fb_login_button"
+		android:layout_below="@+id/loginBtn"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="15dp"
+		android:background="@null">
+	</com.ntu.fypshop.FacebookBtn>
+
+	<ImageButton
+		android:layout_height="wrap_content"
+		android:background="@drawable/twitter_button"
+		android:layout_width="wrap_content"
+		android:id="@+id/twitBtn"
+		android:layout_below="@+id/fbLoginBtn"
+		android:layout_alignLeft="@+id/registerBtn"
+		android:layout_marginTop="10dp">
+	</ImageButton>
+
+	<ImageButton
+		android:layout_height="wrap_content"
+		android:background="@drawable/register_button"
+		android:layout_width="wrap_content"
+		android:id="@+id/registerBtn"
+		android:layout_below="@+id/twitBtn"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="10dp">
+	</ImageButton>
 
 
 

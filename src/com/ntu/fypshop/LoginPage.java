@@ -2,6 +2,7 @@ package com.ntu.fypshop;
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
+import com.ntu.fypshop.TwitterApp.TwDialogListener;
 //import com.facebook.android.Util;
 
 import android.app.Activity;
@@ -25,13 +26,17 @@ import android.widget.*;
 public class LoginPage extends Activity {
 
 	private static final String APP_ID = "222592464462347";
-	// private static final String[] FACEBOOK_PERMISSION =
-	// { "user_birthday", "email" };
+	private TwitterApp mTwitter;
+	private Facebook mFacebook;
+
+	private static final String twitter_consumer_key = "L0UuqLWRkQ0r9LkZvMl0Zw";
+	private static final String twitter_secret_key = "CelQ7Bvl0mLGGKw6iiV3cDcuP0Lh1XAI6x0fCF0Pd4";
 
 	private FacebookBtn fblogin;
 	private static GlobalVariable globalVar;
-	private Facebook mFacebook;
+
 	private ImageButton regBtn;
+	private ImageButton mTwitterBtn;
 	private Button login;
 	private EditText email, password;
 
@@ -68,6 +73,7 @@ public class LoginPage extends Activity {
 		login = (Button) findViewById(R.id.loginBtn);
 		fblogin = (FacebookBtn) findViewById(R.id.fbLoginBtn);
 		regBtn = (ImageButton) findViewById(R.id.registerBtn);
+		mTwitterBtn = (ImageButton) findViewById(R.id.twitBtn);
 
 		// IntentFilter intentFilter = new IntentFilter();
 		// intentFilter.addAction("com.package.ACTION_LOGOUT");
@@ -88,6 +94,20 @@ public class LoginPage extends Activity {
 
 		fblogin.init(this, mFacebook, getApplicationContext());
 		fbInit();
+
+		twitInit();
+		mTwitter = new TwitterApp(this, twitter_consumer_key, twitter_secret_key);
+		mTwitter.setListener(mTwLoginDialogListener);
+		if (mTwitter.hasAccessToken())
+		{
+			// mTwitterBtn.setChecked(true);
+
+			String username = mTwitter.getUsername();
+			username = (username.equals("")) ? "Unknown" : username;
+
+			// mTwitterBtn.setText("  Twitter (" + username + ")");
+			// mTwitterBtn.setTextColor(Color.WHITE);
+		}
 
 		// mAsyncRunner = new AsyncFacebookRunner(mFacebook);
 		regInit();
@@ -119,6 +139,56 @@ public class LoginPage extends Activity {
 
 	}
 
+	private void twitInit()
+	{
+		// TODO Auto-generated method stub
+		mTwitterBtn.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				if (mTwitter.hasAccessToken())
+				{
+					final AlertDialog.Builder builder = new AlertDialog.Builder(LoginPage.this);
+
+					builder.setMessage("Delete current Twitter connection?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener()
+					{
+						public void onClick(DialogInterface dialog, int id)
+						{
+							mTwitter.resetAccessToken();
+
+							// mTwitterBtn.setChecked(false);
+							// mTwitterBtn.setText("  Twitter (Not connected)");
+							// mTwitterBtn.setTextColor(Color.GRAY);
+						}
+					}).setNegativeButton("No", new DialogInterface.OnClickListener()
+					{
+						public void onClick(DialogInterface dialog, int id)
+						{
+							dialog.cancel();
+
+							// mTwitterBtn.setChecked(true);
+						}
+					});
+					final AlertDialog alert = builder.create();
+
+					alert.show();
+				}
+				else
+				{
+					// mTwitterBtn.setChecked(false);
+					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					globalVar = ((GlobalVariable) getApplicationContext());
+					globalVar.setTwitBtn(true);
+					Log.d("Twitter Btn state: ", globalVar.getTwitBtn().toString());
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivityForResult(intent, 1);
+//					mTwitter.authorize();
+				}
+			}
+		});
+	}
+
 	private void loginInit()
 	{
 		// TODO Auto-generated method stub
@@ -146,7 +216,8 @@ public class LoginPage extends Activity {
 					Intent intent = new Intent(v.getContext(), SearchShops.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					Log.d("GlobalVariable name: ", globalVar.getName());
-					// startActivityForResult means that Activity1 can expect info back from Activity2.
+					// startActivityForResult means that Activity1 can expect
+					// info back from Activity2.
 					startActivityForResult(intent, 0);
 				}
 				else
@@ -223,6 +294,39 @@ public class LoginPage extends Activity {
 			}
 		});
 	}
+
+	private final TwDialogListener mTwLoginDialogListener = new TwDialogListener()
+	{
+		@Override
+		public void onComplete(String value)
+		{
+			String username = mTwitter.getUsername();
+			username = (username.equals("")) ? "No Name" : username;
+
+			// mTwitterBtn.setText("  Twitter  (" + username + ")");
+			// mTwitterBtn.setChecked(true);
+			// mTwitterBtn.setTextColor(Color.WHITE);
+
+			// Toast.makeText(TestConnect.this, "Connected to Twitter as " +
+			// username, Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onError(String value)
+		{
+			// mTwitterBtn.setChecked(false);
+			//
+			// Toast.makeText(TestConnect.this, "Twitter connection failed",
+			// Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onCancel()
+		{
+			// TODO Auto-generated method stub
+			
+		}
+	};
 
 	// @Override
 	// protected void onActivityResult(int requestCode, int resultCode, Intent

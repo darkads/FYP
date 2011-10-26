@@ -19,13 +19,15 @@
 		android:layout_weight="1"
 		android:paddingTop="10dip"
 		android:id="@+id/balloon_inner_layout">
+
 		<TextView
 			android:layout_height="wrap_content"
 			android:layout_width="fill_parent"
 			android:id="@+id/balloon_item_title"
 			android:text="balloon_item_title"
 			android:textSize="16dip"
-			android:textColor="#FF000000">
+			android:textColor="#FF000000"
+			android:clickable="true">
 		</TextView>
 
 		<TextView
@@ -35,6 +37,7 @@
 			android:text="balloon_item_snippet"
 			android:textSize="12dip">
 		</TextView>
+
 	</LinearLayout>
 
 	<ImageView

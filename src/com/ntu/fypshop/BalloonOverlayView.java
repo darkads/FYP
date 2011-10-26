@@ -26,11 +26,10 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 	 *            - The bottom padding (in pixels) to be applied when rendering
 	 *            this view.
 	 */
-	public BalloonOverlayView(Context context, int balloonBottomOffset)
+	public BalloonOverlayView(final Context context, int balloonBottomOffset)
 	{
 
 		super(context);
-
 		setPadding(10, 0, 10, balloonBottomOffset);
 		layout = new LinearLayout(context);
 		layout.setVisibility(VISIBLE);
@@ -48,7 +47,7 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 				layout.setVisibility(GONE);
 			}
 		});
-
+		
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		params.gravity = Gravity.NO_GRAVITY;
 

@@ -92,6 +92,13 @@
 		android:clickable="true"
 		android:layout_width="match_parent">
 	</TextView>
+	
+	<Button
+		android:text="Product Page"
+		android:id="@+id/productPageBtn"
+		android:layout_width="wrap_content"
+		android:layout_height="35dp">
+	</Button>
 
 	<RelativeLayout
 		android:orientation="vertical"
