@@ -177,7 +177,7 @@ public class LoginPage extends Activity {
 				else
 				{
 					// mTwitterBtn.setChecked(false);
-					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					Intent intent = new Intent(v.getContext(), Container.class);
 					globalVar = ((GlobalVariable) getApplicationContext());
 					globalVar.setTwitBtn(true);
 					Log.d("Twitter Btn state: ", globalVar.getTwitBtn().toString());
@@ -213,7 +213,7 @@ public class LoginPage extends Activity {
 					editor.putString("pwLogin", globalVar.getHashPw());
 					editor.commit();
 
-					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					Intent intent = new Intent(v.getContext(), Container.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					Log.d("GlobalVariable name: ", globalVar.getName());
 					// startActivityForResult means that Activity1 can expect
@@ -262,7 +262,7 @@ public class LoginPage extends Activity {
 				if (!mFacebook.isSessionValid())
 				{
 					// TODO Auto-generated method stub
-					Intent intent = new Intent(v.getContext(), SearchShops.class);
+					Intent intent = new Intent(v.getContext(), Container.class);
 					globalVar = ((GlobalVariable) getApplicationContext());
 					globalVar.setfbBtn(true);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

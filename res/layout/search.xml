@@ -109,7 +109,7 @@
 			android:layout_height="wrap_content"
 			android:text="Logout"
 			android:layout_width="100dp"
-			android:id="@+id/logoutBtn"
+			android:id="@+id/logoutBtn2"
 			android:layout_alignParentTop="true"
 			android:layout_centerHorizontal="true"></Button>
 

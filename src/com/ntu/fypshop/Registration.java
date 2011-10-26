@@ -125,7 +125,7 @@ public class Registration extends Activity {
 						editor.putString("pwLogin", globalVar.getHashPw());
 						editor.commit();
 						// TODO Auto-generated method stub
-						Intent intent = new Intent(v.getContext(), SearchShops.class);
+						Intent intent = new Intent(v.getContext(), Main.class);
 					    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivityForResult(intent, 2);
 					}
