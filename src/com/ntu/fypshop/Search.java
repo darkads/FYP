@@ -56,7 +56,7 @@ public class Search extends Activity{
 	private TwitterApp mTwitter;
 	private LocationManager locationManager;
 	private GPSLocationListener locationListener;
-	private GeoPoint point = new GeoPoint(1304256, 103832538);;
+	private GeoPoint point = new GeoPoint(1304256, 103832538);
 	private List<GeoPoint> pointList;
 
 	Handler mHandler = new Handler();
