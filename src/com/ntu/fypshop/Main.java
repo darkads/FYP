@@ -87,8 +87,7 @@ public class Main extends Activity implements OnClickListener {
 	protected String[] employees;
 	protected Integer[] employeesid;
 
-	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1,
-			INIT_TWIT = 2;
+	static final int DIALOG_ERR_LOGIN = 0, INIT_NORM = 0, INIT_FB = 1, INIT_TWIT = 2;
 
 	// private String genderS;
 	// private String bdayS;
@@ -110,14 +109,15 @@ public class Main extends Activity implements OnClickListener {
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.browse);
 
-		if (APP_ID == null) {
-			Util.showAlert(this, "Warning", "Facebook Applicaton ID must be "
-					+ "specified before running this example: see Example.java");
+		if (APP_ID == null)
+		{
+			Util.showAlert(this, "Warning", "Facebook Applicaton ID must be " + "specified before running this example: see Example.java");
 		}
 
 		latest = (Button) findViewById(R.id.btnLatest);
@@ -136,8 +136,7 @@ public class Main extends Activity implements OnClickListener {
 		twitBtn = globalVar.getTwitBtn();
 
 		facebook = globalVar.getFBState();
-		mTwitter = new TwitterApp(this, twitter_consumer_key,
-				twitter_secret_key);
+		mTwitter = new TwitterApp(this, twitter_consumer_key, twitter_secret_key);
 		mTwitter.setListener(mTwLoginDialogListener);
 		globalVar.setTwitState(mTwitter);
 
@@ -147,19 +146,20 @@ public class Main extends Activity implements OnClickListener {
 
 		locationListener = new GPSLocationListener();
 
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 		Log.d("FbButton: ", fbBtn.toString());
 		// SharedPreferences sharedPref =
 		// getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 
-		if (fbBtn || facebook.isSessionValid()) {
+		if (fbBtn || facebook.isSessionValid())
+		{
 			// fbConnect = new FbConnect(APP_ID, this, getApplicationContext());
 			init(INIT_FB);
 		}
 
-		else if (twitBtn || mTwitter.hasAccessToken()) {
+		else if (twitBtn || mTwitter.hasAccessToken())
+		{
 			init(INIT_TWIT);
 			// if(mTwitter.hasAccessToken())
 			// {
@@ -171,6 +171,11 @@ public class Main extends Activity implements OnClickListener {
 			// globalVar.setTwitBtn(false);
 			// mTwitter.authorize();
 			// }
+		}
+		
+		else
+		{
+			init(INIT_NORM);
 		}
 		// else
 		// {
@@ -220,7 +225,8 @@ public class Main extends Activity implements OnClickListener {
 		// }, intentFilter);
 	}
 
-	private void init(final int type) {
+	private void init(final int type)
+	{
 		globalVar = ((GlobalVariable) getApplicationContext());
 
 		getProduct("Latest");
@@ -233,17 +239,16 @@ public class Main extends Activity implements OnClickListener {
 		// }
 		// });
 
-		searchResult
-				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> av, View v, int pos,
-							long id) {
-						Intent intent = new Intent(Main.this,
-								Productdetail.class);
-						intent.putExtra("lastproductid", employeesid[pos]);
-						startActivity(intent);
-					}
-				});
+		searchResult.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> av, View v, int pos, long id)
+			{
+				Intent intent = new Intent(Main.this, Productdetail.class);
+				intent.putExtra("lastproductid", employeesid[pos]);
+				startActivity(intent);
+			}
+		});
 	}
 
 	// private void doLogout(int type)
@@ -291,18 +296,24 @@ public class Main extends Activity implements OnClickListener {
 	// }
 
 	@Override
-	public void onClick(View v) {
-		if (v == latest) {
+	public void onClick(View v)
+	{
+		if (v == latest)
+		{
 			getProduct("Latest");
 			latest.setEnabled(false);
 			nearby.setEnabled(true);
 			hot.setEnabled(true);
-		} else if (v == nearby) {
+		}
+		else if (v == nearby)
+		{
 			getProduct("Nearby");
 			nearby.setEnabled(false);
 			latest.setEnabled(true);
 			hot.setEnabled(true);
-		} else if (v == hot) {
+		}
+		else if (v == hot)
+		{
 			getProduct("Hot");
 			hot.setEnabled(false);
 			nearby.setEnabled(true);
@@ -310,12 +321,16 @@ public class Main extends Activity implements OnClickListener {
 		}
 	}
 
-	public void getProduct(String mode) {
+	public void getProduct(String mode)
+	{
 		searchResult.setAdapter(null);
 		ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		if (mode.equals("Latest")) {
+		if (mode.equals("Latest"))
+		{
 			nameValuePairs.add(new BasicNameValuePair("latest", "1"));
-		} else if (mode.equals("Nearby")) {
+		}
+		else if (mode.equals("Nearby"))
+		{
 			String lat = Double.toString(point.getLatitudeE6() / 1E6);
 			String lng = Double.toString(point.getLongitudeE6() / 1E6);
 			String radius = "1000";
@@ -324,46 +339,57 @@ public class Main extends Activity implements OnClickListener {
 			nameValuePairs.add(new BasicNameValuePair("lng", lng));
 			nameValuePairs.add(new BasicNameValuePair("radius", radius));
 
-		} else if (mode.equals("Hot")) {
+		}
+		else if (mode.equals("Hot"))
+		{
 			nameValuePairs.add(new BasicNameValuePair("hot", "1"));
 		}
-		try {
+		try
+		{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost("http://10.0.2.2/browse.php");
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			HttpResponse response = httpclient.execute(httppost);
-			if (response != null) {
+			if (response != null)
+			{
 				HttpEntity entity = response.getEntity();
 				is = entity.getContent();
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			Log.e("log_tag", "Error in http connection" + e.toString());
 		}
 		// convert response to string
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					is, "iso-8859-1"), 8);
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
 			sb = new StringBuilder();
 			sb.append(reader.readLine() + "\n");
 			String line = "0";
-			while ((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null)
+			{
 				sb.append(line + "\n");
 			}
 			is.close();
 			result = sb.toString();
 			Log.d("result: ", result);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			Log.e("log_tag", "Error converting result " + e.toString());
 		}
 		// paring data
 		int ct_id;
 		String ct_name;
-		try {
+		try
+		{
 			jArray = new JSONArray(result);
 			JSONObject json_data = null;
 			employees = new String[jArray.length()];
 			employeesid = new Integer[jArray.length()];
-			for (int i = 0; i < jArray.length(); i++) {
+			for (int i = 0; i < jArray.length(); i++)
+			{
 				json_data = jArray.getJSONObject(i);
 				ct_id = json_data.getInt("id");
 				ct_name = json_data.getString("filename");
@@ -373,20 +399,24 @@ public class Main extends Activity implements OnClickListener {
 				employeesid[i] = ct_id;
 				Log.d("employeesid: ", Integer.toString(employeesid[i]));
 			}
-			ListAdapter adapter = new ArrayAdapter<String>(this,
-					android.R.layout.simple_list_item_1, employees);
+			ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, employees);
 			searchResult.setAdapter(adapter);
-		} catch (JSONException e1) {
-			Toast.makeText(getBaseContext(), "No products Found",
-					Toast.LENGTH_SHORT).show();
-		} catch (ParseException e1) {
+		}
+		catch (JSONException e1)
+		{
+			Toast.makeText(getBaseContext(), "No products Found", Toast.LENGTH_SHORT).show();
+		}
+		catch (ParseException e1)
+		{
 			e1.printStackTrace();
 		}
 	}
 
-	private final TwDialogListener mTwLoginDialogListener = new TwDialogListener() {
+	private final TwDialogListener mTwLoginDialogListener = new TwDialogListener()
+	{
 		@Override
-		public void onComplete(String value) {
+		public void onComplete(String value)
+		{
 			String username = mTwitter.getUsername();
 			username = (username.equals("")) ? "No Name" : username;
 
@@ -404,7 +434,8 @@ public class Main extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public void onError(String value) {
+		public void onError(String value)
+		{
 			// mTwitterBtn.setChecked(false);
 			//
 			// Toast.makeText(TestConnect.this, "Twitter connection failed",
@@ -412,7 +443,8 @@ public class Main extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public void onCancel() {
+		public void onCancel()
+		{
 			// Return to the login activity
 			Intent intent = new Intent(Main.this, LoginPage.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -436,12 +468,15 @@ public class Main extends Activity implements OnClickListener {
 	// }
 
 	public class LogoutRequestListener extends BaseRequestListener {
-		public void onComplete(String response, final Object state) {
+		public void onComplete(String response, final Object state)
+		{
 
 			// callback should be run in the original thread,
 			// not the background thread
-			mHandler.post(new Runnable() {
-				public void run() {
+			mHandler.post(new Runnable()
+			{
+				public void run()
+				{
 					SessionEvents.onLogoutFinish();
 				}
 			});
@@ -451,11 +486,12 @@ public class Main extends Activity implements OnClickListener {
 	private class GPSLocationListener implements LocationListener {
 
 		@Override
-		public void onLocationChanged(Location location) {
-			if (location != null) {
+		public void onLocationChanged(Location location)
+		{
+			if (location != null)
+			{
 
-				point = new GeoPoint((int) (location.getLatitude() * 1E6),
-						(int) (location.getLongitude() * 1E6));
+				point = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
 
 				// add marker
 				// MapOverlay mapOverlay = new MapOverlay(MY_POINT);
@@ -477,19 +513,22 @@ public class Main extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public void onProviderDisabled(String provider) {
+		public void onProviderDisabled(String provider)
+		{
 			// TODO Auto-generated method stub
 
 		}
 
 		@Override
-		public void onProviderEnabled(String provider) {
+		public void onProviderEnabled(String provider)
+		{
 			// TODO Auto-generated method stub
 
 		}
 
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
+		public void onStatusChanged(String provider, int status, Bundle extras)
+		{
 			// TODO Auto-generated method stub
 
 		}

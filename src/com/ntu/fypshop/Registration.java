@@ -110,7 +110,7 @@ public class Registration extends Activity {
 				ConnectDB connect;
 				try
 				{
-					connect = new ConnectDB(name.getText().toString(), email.getText().toString(), password.getText().toString());
+					connect = new ConnectDB(name.getText().toString(), email.getText().toString(), password.getText().toString(), "user_norm");
 					if (connect.inputResult())
 					{
 						GlobalVariable globalVar = ((GlobalVariable) getApplicationContext());
@@ -121,11 +121,13 @@ public class Registration extends Activity {
 
 						SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 						SharedPreferences.Editor editor = login.edit();
-						editor.putString("emailLogin", globalVar.getEm());
-						editor.putString("pwLogin", globalVar.getHashPw());
+						editor.putString("userID", connect.getUserID());
+						editor.putString("userName", connect.getUserName());
+						editor.putString("emailLogin", connect.getUserEmail());
+						editor.putString("pwLogin", connect.getPassword());
 						editor.commit();
 						// TODO Auto-generated method stub
-						Intent intent = new Intent(v.getContext(), Main.class);
+						Intent intent = new Intent(v.getContext(), Container.class);
 					    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivityForResult(intent, 2);
 					}

@@ -202,15 +202,17 @@ public class LoginPage extends Activity {
 				{
 					Log.d("Authenticate User: ", "True");
 					globalVar = ((GlobalVariable) getApplicationContext());
-					globalVar.setName(connectCheck.getName());
+					globalVar.setName(connectCheck.getUserName());
 					globalVar.setfbBtn(false);
 					globalVar.setHashPw(connectCheck.getPassword());
 					globalVar.setEm(email.getText().toString());
 
 					SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 					SharedPreferences.Editor editor = login.edit();
-					editor.putString("emailLogin", globalVar.getEm());
-					editor.putString("pwLogin", globalVar.getHashPw());
+					editor.putString("emailLogin", connectCheck.getUserEmail());
+					editor.putString("pwLogin", connectCheck.getPassword());
+					editor.putString("userName", connectCheck.getUserName());
+					editor.putString("userID", connectCheck.getUserID());
 					editor.commit();
 
 					Intent intent = new Intent(v.getContext(), Container.class);

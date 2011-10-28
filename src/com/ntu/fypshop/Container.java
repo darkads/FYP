@@ -1,5 +1,8 @@
 package com.ntu.fypshop;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,7 +54,8 @@ public class Container extends TabActivity {
 
 	private String fnameS;
 	private String lnameS;
-	private String nameS;
+	private String userName;
+	private String userEmail;
 
 	Button logout;
 
@@ -65,10 +69,9 @@ public class Container extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.container);
 
-//		tabHost = (TabHost) findViewById(R.id.tabhost);
+		// tabHost = (TabHost) findViewById(R.id.tabhost);
 		res = getResources(); // Resource object to get Drawables
-		tabHost = getTabHost(); // The activity TabHost	
-		
+		tabHost = getTabHost(); // The activity TabHost
 
 		if (APP_ID == null)
 		{
@@ -76,24 +79,7 @@ public class Container extends TabActivity {
 		}
 
 		logout = (Button) findViewById(R.id.logoutBtn1);
-		// Create an Intent to launch an Activity for the tab (to be reused)
-		intent = new Intent().setClass(this, Main.class);
 
-		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec = tabHost.newTabSpec("home").setIndicator("Browse", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
-		tabHost.addTab(spec);
-
-		// Do the same for the other tabs
-		intent = new Intent().setClass(this, Startcamera.class);
-		spec = tabHost.newTabSpec("attraction").setIndicator("Share", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
-		tabHost.addTab(spec);
-
-		intent = new Intent().setClass(this, Search.class);
-		spec = tabHost.newTabSpec("checkin").setIndicator("Search", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
-		tabHost.addTab(spec);
-
-		tabHost.setCurrentTab(0);
-		
 		/*
 		 * tabHost.setOnTabChangedListener(new OnTabChangeListener(){
 		 * 
@@ -167,11 +153,29 @@ public class Container extends TabActivity {
 			}
 		}
 
+		// Create an Intent to launch an Activity for the tab (to be reused)
+		intent = new Intent().setClass(this, Main.class);
+
+		// Initialize a TabSpec for each tab and add it to the TabHost
+		spec = tabHost.newTabSpec("home").setIndicator("Browse", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
+		tabHost.addTab(spec);
+
+		// Do the same for the other tabs
+		intent = new Intent().setClass(this, Startcamera.class);
+		spec = tabHost.newTabSpec("attraction").setIndicator("Share", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
+		tabHost.addTab(spec);
+
+		intent = new Intent().setClass(this, Search.class);
+		spec = tabHost.newTabSpec("checkin").setIndicator("Search", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
+		tabHost.addTab(spec);
+
+		tabHost.setCurrentTab(0);
+
 	}
 
 	private void init(final int type)
 	{
-		
+
 		logout.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v)
@@ -193,8 +197,10 @@ public class Container extends TabActivity {
 
 			SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 			SharedPreferences.Editor editor = login.edit();
-			editor.putString("emailLogin", "");
-			editor.putString("pwLogin", "");
+			editor.putString("userName", null);
+			editor.putString("userID", null);
+			editor.putString("emailLogin", null);
+			editor.putString("pwLogin", null);
 			editor.commit();
 		}
 		else if (type == INIT_FB)
@@ -202,7 +208,9 @@ public class Container extends TabActivity {
 			// Go to LoginPage
 			SharedPreferences login = getSharedPreferences("com.ntu.fypshop", MODE_PRIVATE);
 			SharedPreferences.Editor editor = login.edit();
-			editor.putString("facebookName", "");
+			editor.putString("userName", null);
+			editor.putString("userID", null);
+			editor.putString("emailLogin", null);
 			editor.commit();
 			globalVar = ((GlobalVariable) getApplicationContext());
 			Facebook mFacebook = globalVar.getFBState();
@@ -222,19 +230,19 @@ public class Container extends TabActivity {
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
-	
-//	@Override
-//	protected void onResume()
-//	{
-//		super.onResume();
-//
-//		setContentView(R.layout.container);
-//		
-//		res = getResources();
-//		tabHost = getTabHost(); 
-//		init(TYPE);
-//	}
-	
+
+	// @Override
+	// protected void onResume()
+	// {
+	// super.onResume();
+	//
+	// setContentView(R.layout.container);
+	//
+	// res = getResources();
+	// tabHost = getTabHost();
+	// init(TYPE);
+	// }
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
@@ -373,8 +381,8 @@ public class Container extends TabActivity {
 					JSONObject json = Util.parseJson(response);
 					fnameS = json.getString("first_name");
 					lnameS = json.getString("last_name");
-					nameS = fnameS + " " + lnameS;
-					// emailS = json.getString("email");
+					userName = fnameS + " " + lnameS;
+					userEmail = json.getString("email");
 					// genderS = json.getString("gender");
 					// bdayS = json.getString("birthday");
 					Log.d("Facebook", fnameS);
@@ -387,10 +395,30 @@ public class Container extends TabActivity {
 					{
 						public void run()
 						{
-							editor.putString("facebookName", nameS);
-							editor.commit();
-							// name.setText("Hello " + nameS + ",");
-							mProgress.dismiss();
+							ConnectDB connectCheck;
+							try
+							{
+								connectCheck = new ConnectDB(userName, userEmail, "", "user_fb");
+
+								editor.putString("userName", connectCheck.getUserName());
+								editor.putString("emailLogin", connectCheck.getUserEmail());
+								editor.putString("userID", connectCheck.getUserID());
+								editor.commit();
+
+								editor.commit();
+								// name.setText("Hello " + nameS + ",");
+								mProgress.dismiss();
+							}
+							catch (NoSuchAlgorithmException e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							catch (UnsupportedEncodingException e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							// globalVar = ((GlobalVariable)
 							// getApplicationContext());
 							// globalVar.setName(nameS);
