@@ -1,5 +1,7 @@
 package com.ntu.fypshop;
 
+import java.util.List;
+
 import com.facebook.android.Facebook;
 import com.google.android.maps.GeoPoint;
 
@@ -17,6 +19,7 @@ public class GlobalVariable extends Application {
 	private String email = "";
 	private Integer searchType = 0;
 	private GeoPoint gPoint;
+	private List<Shop> shop = null;
 
 	public Facebook getFBState()
 	{
@@ -108,5 +111,15 @@ public class GlobalVariable extends Application {
 	public Boolean getTwitBtn()
 	{
 		return twitBtn;
+	}
+	
+	public void setShop(List<Shop> shops)
+	{
+		shop = shops;
+	}
+	
+	public List<Shop> getShop()
+	{
+		return shop;
 	}
 }// End Class

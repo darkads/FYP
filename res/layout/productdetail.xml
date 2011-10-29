@@ -59,6 +59,7 @@
 				android:textAppearance="?android:attr/textAppearanceMedium"
 				android:id="@+id/shopname"
 				android:layout_width="wrap_content"
+				android:clickable="true"
 				android:textColor="#FFFFFF"></TextView>
 			<TextView
 				android:text="Shop address"
@@ -66,6 +67,7 @@
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:id="@+id/lblshopaddress"
 				android:layout_width="wrap_content"
+				android:clickable="true"
 				android:textColor="#FFFFFF"></TextView>
 			<TableLayout
 				android:layout_width="match_parent"

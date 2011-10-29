@@ -17,6 +17,7 @@ import com.google.android.maps.OverlayItem;
 //import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.widget.TextView;
 
 public class ShopPage extends MapActivity {
 
@@ -24,7 +25,8 @@ public class ShopPage extends MapActivity {
 	private MapController mapController;
 	private GeoPoint gp;
 	private GlobalVariable globalVar;
-	
+	private TextView shopTitle, shopAddress;
+
 	List<Overlay> mapOverlays;
 	Drawable drawable;
 	MapItemizedOverlay itemizedOverlay;
@@ -39,30 +41,37 @@ public class ShopPage extends MapActivity {
 		// TODO Auto-generated method stub
 
 		mapView = (MapView) findViewById(R.id.shopMap);
+		shopTitle = (TextView) findViewById(R.id.shopTitle);
+		shopAddress = (TextView) findViewById(R.id.shopAddress);
 		globalVar = ((GlobalVariable) getApplicationContext());
 
-		gp = globalVar.getGeoPoint();
-		
+		Shop shopDetail = globalVar.getShop().get(0);
+		Double latitude = Double.parseDouble(shopDetail.getLat());
+		Double longitude = Double.parseDouble(shopDetail.getLng());
+		shopTitle.setText(shopDetail.getName());
+		shopAddress.setText(shopDetail.getAddress());
+		gp = new GeoPoint((int) (latitude * 1E6), (int) (longitude * 1E6));
+
 		mapView.setBuiltInZoomControls(false);
 		mapController = mapView.getController();
 		mapController.setZoom(16);
 		mapController.setCenter(gp);
-		
+
 		mapOverlays = mapView.getOverlays();
 		drawable = this.getResources().getDrawable(R.drawable.pushpin);
 		itemizedOverlay = new MapItemizedOverlay(drawable);
-		
+
 		OverlayItem overlayitem = new OverlayItem(gp, "", "");
 		itemizedOverlay.addOverlay(overlayitem);
 		mapOverlays.clear();
 		mapOverlays.add(itemizedOverlay);
 		mapView.invalidate();
-	}	
+	}
 
 	class MapItemizedOverlay extends ItemizedOverlay<OverlayItem> {
-		
+
 		private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
-		
+
 		public MapItemizedOverlay(Drawable defaultMarker)
 		{
 			super(boundCenterBottom(defaultMarker));
@@ -83,9 +92,10 @@ public class ShopPage extends MapActivity {
 			return mOverlays.size();
 		}
 
-		public void addOverlay(OverlayItem overlay) {
-		    mOverlays.add(overlay);
-		    populate();
+		public void addOverlay(OverlayItem overlay)
+		{
+			mOverlays.add(overlay);
+			populate();
 		}
 	}
 

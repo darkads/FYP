@@ -31,8 +31,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Search extends Activity{
 	
@@ -45,6 +47,7 @@ public class Search extends Activity{
 	private TextView departmentalStores, clothes, others; //name, departmentalStores, clothes, others;
 	private Button logout, genSearch, locSearch, productPage;
 	private RadioGroup searchType;
+	private EditText searchTerm;
 	// private UserParticulars userS;
 //	private String fnameS;
 //	private String lnameS;
@@ -97,6 +100,7 @@ public class Search extends Activity{
 		locSearch = (Button) findViewById(R.id.locSearchBtn);
 		searchType = (RadioGroup) findViewById(R.id.searchTypeRadio);
 		productPage = (Button) findViewById(R.id.productPageBtn);
+		searchTerm = (EditText) findViewById(R.id.searchText);
 
 		globalVar = ((GlobalVariable) getApplicationContext());
 		fbBtn = globalVar.getfbBtn();
@@ -189,7 +193,12 @@ public class Search extends Activity{
 		// TODO Auto-generated method stub
 		// if (globalVar.getSearchType() == 1)
 		// {
-		ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, getSearchType(), 1000);
+		if(point == null)
+		{
+			Toast.makeText(this, "Unable to get a gps connection. Is your gps service turned on?", Toast.LENGTH_SHORT);
+			return;
+		}
+		ConnectDB connect = new ConnectDB(point.getLatitudeE6() / 1E6, point.getLongitudeE6() / 1E6, getSearchType(), searchTerm.getText().toString(), 1000);
 
 		pointList = new ArrayList<GeoPoint>();
 		// Log.d("Store Location Results in activity: ",
@@ -253,7 +262,7 @@ public class Search extends Activity{
 			public void onClick(View v)
 			{
 				globalVar.setSearchType(2);
-				Intent intent = new Intent(v.getContext(), MapResult.class);
+				Intent intent = new Intent(v.getContext(), Addplace.class);
 				startActivity(intent);
 			}
 		});

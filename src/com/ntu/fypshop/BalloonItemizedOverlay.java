@@ -17,7 +17,7 @@ import com.google.android.maps.OverlayItem;
 
 public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends ItemizedOverlay<Item> {
 	private MapView mapView;
-	private BalloonOverlayView<Item> balloonView;
+	public BalloonOverlayView<Item> balloonView;
 	private View clickRegion;
 	private int viewOffset;
 	final MapController mc;
@@ -41,6 +41,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 		this.mapView = mapView;
 		viewOffset = 0;
 		mc = mapView.getController();
+		
 	}
 
 	/**
@@ -94,6 +95,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 
 		mc.animateTo(currentFocussedItem.getPoint());
 
+		globalVar.setGeoPoint(currentFocussedItem.getPoint());
 		return true;
 	}
 
@@ -117,7 +119,7 @@ public abstract class BalloonItemizedOverlay<Item extends OverlayItem> extends I
 	/**
 	 * Sets the visibility of this overlay's balloon view to GONE.
 	 */
-	protected void hideBalloon()
+	public void hideBalloon()
 	{
 		if (balloonView != null)
 		{

@@ -348,20 +348,25 @@ public class ConnectDB {
 		// }
 	}
 
-	public ConnectDB(Double lat, Double lng, Integer radius)
+	public ConnectDB(String address, String name)
 	{
 		// the data to send
-		ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		nameValuePairs.add(new BasicNameValuePair("lat", Double.toString(lat)));
-		nameValuePairs.add(new BasicNameValuePair("lng", Double.toString(lng)));
-		nameValuePairs.add(new BasicNameValuePair("radius", Integer.toString(radius)));
+//		ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+//		nameValuePairs.add(new BasicNameValuePair("address", address));
+//		nameValuePairs.add(new BasicNameValuePair("name", name));
+		JSONObject json = new JSONObject();
 		// http post
 		try
 		{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost("http://10.0.2.2/storeLocations.php");
-
-			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			json.put("address", address);
+			json.put("name", name);
+			httppost.setHeader("json", json.toString());
+			StringEntity se = new StringEntity(json.toString());
+			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+//			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			httppost.setEntity(se);
 			HttpResponse response = httpclient.execute(httppost);
 			HttpEntity entity = response.getEntity();
 			is = entity.getContent();
@@ -390,7 +395,7 @@ public class ConnectDB {
 			for (int i = 0; i < jArray.length(); i++)
 			{
 				jsonObj = jArray.getJSONObject(i);
-				shop.add(new Shop(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng"), jsonObj.getString("distance")));
+				shop.add(new Shop(jsonObj.getString("address"), jsonObj.getString("name"), jsonObj.getString("lat"), jsonObj.getString("lng")));
 			}
 			// JSONArray values = jsonObj.getJSONArray("row");
 			// for (int i = 0; i < values.length(); i++)
@@ -409,7 +414,7 @@ public class ConnectDB {
 			is.close();
 
 			result = jsonObj.getString("address");// sb.toString();
-			Log.d("Result in ConnectDB for locations: ", result);
+			Log.d("Result in ConnectDB for shopSearch: ", result);
 			// if (result.equals("1"))
 			// {
 			// storeLocResult(1);
@@ -426,7 +431,7 @@ public class ConnectDB {
 		}
 	}
 
-	public ConnectDB(final Double lat, final Double lng, final String searchType, final Integer radius)
+	public ConnectDB(final Double lat, final Double lng, final String searchType, String searchTerms, final Integer radius)
 	{
 		// Thread t = new Thread()
 		// {
@@ -457,6 +462,7 @@ public class ConnectDB {
 			json.put("lat", Double.toString(lat));
 			json.put("lng", Double.toString(lng));
 			json.put("type", searchType);
+			json.put("searchTerms", searchTerms);
 			json.put("radius", Integer.toString(radius));
 			httppost.setHeader("json", json.toString());
 			StringEntity se = new StringEntity(json.toString());
